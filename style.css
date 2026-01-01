@@ -1,39 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
 
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    /* Aapka Background */
-    background: url('unnamed.png') no-repeat center center fixed;
-    background-size: cover;
+    background: #dadbd3; /* WhatsApp Background Color */
 }
 
-/* Glass effect container */
+/* WhatsApp Green Top Bar */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 130px;
+    background-color: #00a884; /* WhatsApp Green */
+    z-index: -1;
+}
+
 .main-container {
     position: relative;
-    width: 1100px;
+    width: 1396px;
     max-width: 95%;
     height: calc(100vh - 40px);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: #fff;
     display: flex;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
-/* Left Sidebar (Login/Users) */
+/* Hidden elements */
+.hidden { display: none !important; }
+
+/* Login Screen Styles */
+#login {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #f0f2f5;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Left Sidebar */
 .left-container {
     position: relative;
     width: 30%;
-    background: rgba(255, 255, 255, 0.9);
-    border-right: 1px solid #ddd;
+    height: 100%;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
 }
 
 /* Right Chat Area */
@@ -41,86 +71,109 @@ body {
     position: relative;
     width: 70%;
     height: 100%;
-    background: rgba(229, 221, 213, 0.4); /* Transparent chat background */
-    display: flex;
-    flex-direction: column;
+    background: #e5ddd5;
+}
+
+/* WhatsApp Chat Background Pattern */
+.right-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    opacity: 0.08;
 }
 
 .header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     height: 60px;
-    background: #673AB7; /* Professional Purple */
-    color: white;
-    display: flex;
-    align-items: center;
+    background: #f0f2f5;
     padding: 0 15px;
-    justify-content: space-between;
+    z-index: 10;
 }
 
-.user-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #FFDAB9; }
+.user-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
 
-/* Chat Box Area */
+/* Chat Container */
 .chat-container {
-    flex: 1;
-    padding: 20px;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 120px);
+    padding: 20px 50px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    z-index: 1;
 }
 
-/* Message Bubbles */
-.message-box { display: flex; width: 100%; margin: 5px 0; }
-.my-message { justify-content: flex-end; }
-.friend-message { justify-content: flex-start; }
+.message-box {
+    display: flex;
+    width: 100%;
+    margin: 5px 0;
+}
 
 .message-box p {
-    max-width: 65%;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 0.95em;
     position: relative;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 65%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
-.my-message p { background: #FFCCBC; color: #333; border-top-right-radius: 0; }
-.friend-message p { background: #fff; color: #333; border-top-left-radius: 0; }
+.my-message { justify-content: flex-end; }
+.my-message p { background: #dcf8c6; } /* WhatsApp Sent Color */
+
+.friend-message { justify-content: flex-start; }
+.friend-message p { background: #fff; } /* WhatsApp Received Color */
 
 .message-box span {
     display: block;
-    font-size: 0.7em;
-    opacity: 0.6;
-    margin-top: 5px;
+    font-size: 0.75em;
+    opacity: 0.5;
+    margin-top: 4px;
     text-align: right;
 }
 
-/* Input Area */
+/* Input Bar */
 .chatbox-input {
-    height: 70px;
-    background: #f0f0f0;
-    padding: 10px 20px;
+    position: relative;
+    width: 100%;
+    height: 60px;
+    background: #f0f2f5;
     display: flex;
     align-items: center;
-    gap: 15px;
+    padding: 0 15px;
+    z-index: 10;
 }
 
 .chatbox-input input {
     flex: 1;
-    padding: 12px 20px;
-    border-radius: 25px;
+    margin: 0 15px;
+    padding: 10px 20px;
+    border-radius: 8px;
     border: none;
     outline: none;
-    font-size: 1em;
+    font-size: 0.95em;
 }
 
-.chatbox-input button {
-    background: #673AB7;
-    color: white;
-    border: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
+.chatbox-input i {
+    font-size: 1.5em;
+    color: #54656f;
     cursor: pointer;
 }
 
-.hidden { display: none; }
+.send-btn {
+    background: none;
+    border: none;
+    outline: none;
+}
