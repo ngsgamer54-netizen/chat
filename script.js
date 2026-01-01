@@ -1,4 +1,4 @@
-// Firebase Configuration
+// Firebase Configuration from your screenshot
 const firebaseConfig = {
   apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
   authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -19,13 +19,15 @@ const socket = io("https://chat-tr1m.onrender.com");
 let myName = "";
 let myPhoto = "";
 
-// Yeh function check karega ki button click ho raha hai ya nahi
-window.onload = function() {
+// Yeh function page load hote hi chalega
+window.addEventListener('load', function() {
     const loginBtn = document.getElementById('google-login-btn');
     
     if (loginBtn) {
-        loginBtn.onclick = function() {
-            console.log("Button Clicked!"); // Console mein check karne ke liye
+        // Direct click event listener
+        loginBtn.addEventListener('click', function() {
+            console.log("Button click detected!");
+            
             auth.signInWithPopup(provider)
                 .then((result) => {
                     const user = result.user;
@@ -35,20 +37,23 @@ window.onload = function() {
                     document.getElementById("login").classList.add("hidden");
                     document.getElementById("chat-ui").classList.remove("hidden");
                     document.getElementById("user-avatar").src = myPhoto;
-                }).catch((error) => {
+                    
+                    console.log("Logged in as:", myName);
+                })
+                .catch((error) => {
                     console.error("Auth Error:", error);
-                    alert("Error: " + error.message);
+                    alert("Google Login Error: " + error.message);
                 });
-        };
+        });
     } else {
-        console.log("Button not found in HTML!");
+        console.error("ERROR: Button with ID 'google-login-btn' not found!");
     }
-};
+});
 
 // Send Message
 function sendMsg() {
     const input = document.getElementById("msg-input");
-    if (input.value.trim() && myName) {
+    if (input && input.value.trim() !== "") {
         const msgData = {
             user: myName,
             text: input.value,
@@ -62,6 +67,8 @@ function sendMsg() {
 // Receive Message
 socket.on("receive_message", (data) => {
     const box = document.getElementById("chat-box");
+    if (!box) return;
+    
     const div = document.createElement("div");
     const isMe = data.user === myName;
     
