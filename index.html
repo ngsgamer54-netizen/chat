@@ -18,11 +18,8 @@
         .hidden { display: none !important; }
 
         /* Login Screen */
-        .whatsapp-login-container { height: 100vh; width: 100%; position: relative; }
+        .whatsapp-login-container { height: 100vh; width: 100%; position: relative; z-index: 100; }
         .green-header { background-color: #00a884; height: 220px; width: 100%; padding: 30px 10%; color: white; }
-        .logo-area { display: flex; align-items: center; gap: 15px; font-weight: 600; font-size: 14px; }
-        .logo-area i { font-size: 35px; }
-        
         .login-box {
             position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
             background: white; width: 1000px; max-width: 95%; height: 500px;
@@ -30,100 +27,96 @@
             display: flex; flex-direction: column; justify-content: center;
         }
         .login-content { display: flex; justify-content: space-around; align-items: center; gap: 20px; }
-        .instructions h2 { color: #41525d; font-weight: 300; margin-bottom: 20px; font-size: 26px; }
-        .instructions ol { color: #41525d; line-height: 2; padding-left: 20px; font-size: 16px; margin-bottom: 30px; }
 
-        /* Icon Fix: Font-Awesome Google Icon */
+        /* Google Button styling */
         .google-btn {
             display: flex; align-items: center; justify-content: center;
-            background: #ffffff; border: 1px solid #747775;
-            padding: 12px 25px; border-radius: 5px; cursor: pointer;
-            font-weight: 600; color: #1f1f1f; transition: 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: fit-content;
+            background: #4285F4; border: none; padding: 12px 25px; 
+            border-radius: 4px; cursor: pointer; font-weight: 600; color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-top: 20px;
         }
-        .google-btn:hover { background: #f8f9fa; }
-        .google-btn i { 
-            font-size: 22px; 
-            margin-right: 12px; 
-            color: #4285F4; /* Google Blue Color */
-            display: inline-block !important; 
-        }
+        .google-btn i { font-size: 20px; margin-right: 12px; }
 
-        .qr-area { text-align: center; }
-        .qr-area img { width: 220px; border: 1px solid #eee; padding: 10px; background: white; }
+        /* Main Chat Layout */
+        .main-container { display: flex; height: 100vh; width: 100%; background: #f0f2f5; }
+        
+        /* Sidebar for Users List */
+        .left-sidebar { width: 30%; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .sidebar-header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #ddd; justify-content: space-between; }
+        .users-list { flex: 1; overflow-y: auto; }
+        .user-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; cursor: pointer; transition: 0.3s; }
+        .user-item:hover { background: #f5f5f5; }
+        .user-item img { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; }
+        .user-info h4 { font-size: 15px; color: #111; font-weight: 500; }
+        .user-info p { font-size: 13px; color: #667781; }
 
-        /* Chat UI */
-        .main-container { display: flex; height: 100vh; width: 100%; }
-        .left-container { width: 30%; background: #fff; border-right: 1px solid #ddd; }
-        .right-container { width: 70%; position: relative; background: #efeae2; }
-        .header { height: 60px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid rgba(0,0,0,0.08); }
-        .user-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #ccc; }
-        .user-img img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-container { height: calc(100vh - 120px); overflow-y: auto; padding: 20px 50px; display: flex; flex-direction: column; }
-        .message-box { display: flex; margin: 5px 0; width: 100%; }
-        .my-message { justify-content: flex-end; }
-        .friend-message { justify-content: flex-start; }
-        .message-box p { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .my-message p { background: #dcf8c6; }
-        .friend-message p { background: #fff; }
-        .chatbox-input { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 10px; }
-        .chatbox-input input { flex: 1; margin: 0 10px; padding: 12px; border-radius: 8px; border: none; outline: none; }
+        /* Chat Area */
+        .right-chat { width: 70%; display: flex; flex-direction: column; background: #efeae2; position: relative; }
+        .right-chat::before { content: ""; position: absolute; width: 100%; height: 100%; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); opacity: 0.06; }
+        
+        .chat-header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 15px; z-index: 10; border-bottom: 1px solid #ddd; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; z-index: 5; }
+        .message-box { display: flex; margin: 4px 0; width: 100%; }
+        .my-msg { justify-content: flex-end; }
+        .friend-msg { justify-content: flex-start; }
+        .message-box p { background: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; max-width: 60%; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .my-msg p { background: #dcf8c6; }
+        
+        .input-area { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 5px 15px; z-index: 10; }
+        .input-area input { flex: 1; border: none; padding: 10px 15px; border-radius: 20px; outline: none; margin: 0 10px; }
+        .send-btn { color: #00a884; font-size: 22px; cursor: pointer; border: none; background: none; }
     </style>
 </head>
 <body>
 
-    <div id="login" class="whatsapp-login-container">
+    <div id="login-screen" class="whatsapp-login-container">
         <div class="green-header">
-            <div class="logo-area"><i class="fab fa-whatsapp"></i><span>WHATSAPP WEB CLONE</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><i class="fab fa-whatsapp" style="font-size:30px;"></i> WHATSAPP WEB</div>
         </div>
         <div class="login-box">
             <div class="login-content">
-                <div class="instructions">
-                    <h2>Use WhatsApp on your computer</h2>
-                    <ol>
-                        <li>Click the button below.</li>
-                        <li>Sign in with your Google account.</li>
-                        <li>Start chatting in the Global Room.</li>
-                    </ol>
-                    <button class="google-btn" id="google-login-btn">
-                        <i class="fab fa-google"></i>
-                        <span>Sign in with Google</span>
+                <div>
+                    <h2>Login to Start Chatting</h2>
+                    <p style="color:#667781; margin-top:10px;">Connect with everyone in the global room.</p>
+                    <button class="google-btn" id="login-btn">
+                        <i class="fab fa-google"></i> Sign in with Google
                     </button>
                 </div>
-                <div class="qr-area">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WhatsAppClone" alt="QR">
-                    <p style="margin-top:10px; color:#667781; font-size:14px;">Security verified</p>
-                </div>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WhatsApp" style="border:1px solid #eee; padding:10px;">
             </div>
         </div>
     </div>
 
-    <div id="chat-ui" class="main-container hidden">
-        <div class="left-container">
-            <div class="header">
-                <div class="user-img"><img id="user-avatar" src="" alt=""></div>
-                <div style="color: #54656f; font-size: 20px;"><i class="fas fa-comment-dots"></i></div>
-            </div>
-        </div>
-        <div class="right-container">
-            <div class="header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt=""></div>
-                    <h4>Global Chat Room</h4>
+    <div id="chat-screen" class="main-container hidden">
+        <div class="left-sidebar">
+            <div class="sidebar-header">
+                <img id="my-avatar" src="" style="width:40px; height:40px; border-radius:50%; background:#ccc;">
+                <div style="color:#54656f; font-size:18px;">
+                    <i class="fas fa-circle-notch"></i> &nbsp;
+                    <i class="fas fa-comment-alt"></i> &nbsp;
+                    <i class="fas fa-ellipsis-v"></i>
                 </div>
             </div>
-            <div id="chat-box" class="chat-container"></div>
-            <div class="chatbox-input">
-                <i class="far fa-smile" style="font-size: 24px; color: #54656f; margin-left: 10px;"></i>
+            <div class="users-list" id="users-display">
+                <div style="padding:20px; text-align:center; color:#667781;">Loading online users...</div>
+            </div>
+        </div>
+
+        <div class="right-chat">
+            <div class="chat-header">
+                <h4 id="chat-title">Global Chat Room</h4>
+            </div>
+            <div class="chat-messages" id="message-container"></div>
+            <div class="input-area">
+                <i class="far fa-smile" style="font-size:24px; color:#54656f;"></i>
                 <input type="text" id="msg-input" placeholder="Type a message">
-                <button onclick="sendMsg()" style="border:none; background:none; cursor:pointer; padding: 0 15px;">
-                    <i class="fas fa-paper-plane" style="color: #00a884; font-size: 22px;"></i>
-                </button>
+                <button class="send-btn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
             authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -137,24 +130,32 @@
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
         const socket = io("https://chat-tr1m.onrender.com");
-        let myName = "";
 
-        document.getElementById('google-login-btn').onclick = function() {
+        let currentUser = null;
+
+        // Login Logic
+        document.getElementById('login-btn').onclick = () => {
             auth.signInWithPopup(provider).then((result) => {
-                myName = result.user.displayName;
-                document.getElementById("user-avatar").src = result.user.photoURL;
-                document.getElementById("login").classList.add("hidden");
-                document.getElementById("chat-ui").classList.remove("hidden");
-            }).catch(err => {
-                if (err.code !== 'auth/cancelled-popup-request') alert("Error: " + err.message);
-            });
+                currentUser = result.user;
+                document.getElementById("my-avatar").src = currentUser.photoURL;
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("chat-screen").classList.remove("hidden");
+                
+                // Server ko inform karein ki main login ho gaya hoon
+                socket.emit("user_join", {
+                    name: currentUser.displayName,
+                    photo: currentUser.photoURL,
+                    id: currentUser.uid
+                });
+            }).catch(err => alert("Login Error: " + err.message));
         };
 
+        // Messages Send/Receive
         function sendMsg() {
             const input = document.getElementById("msg-input");
-            if (input.value.trim() && myName) {
+            if (input.value.trim() && currentUser) {
                 socket.emit("send_message", {
-                    user: myName,
+                    user: currentUser.displayName,
                     text: input.value,
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 });
@@ -163,13 +164,37 @@
         }
 
         socket.on("receive_message", (data) => {
-            const box = document.getElementById("chat-box");
+            const container = document.getElementById("message-container");
+            const isMe = data.user === currentUser?.displayName;
             const div = document.createElement("div");
-            const isMe = data.user === myName;
-            div.className = `message-box ${isMe ? "my-message" : "friend-message"}`;
-            div.innerHTML = `<p><b style="font-size:0.7em; color:#075e54; display:block;">${isMe ? "You" : data.user}</b>${data.text}<span style="display:block; font-size:0.65em; opacity:0.5; text-align:right;">${data.time}</span></p>`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
+            div.className = `message-box ${isMe ? "my-msg" : "friend-msg"}`;
+            div.innerHTML = `<p><b style="font-size:11px; color:#075e54;">${isMe ? "You" : data.user}</b><br>${data.text}</p>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        });
+
+        // USERS LIST UPDATE LOGIC
+        // Note: Ise chalane ke liye aapke Render wale server par 'update_users' event hona zaruri hai
+        socket.on("update_users", (users) => {
+            const list = document.getElementById("users-display");
+            list.innerHTML = "";
+            
+            Object.values(users).forEach(user => {
+                const item = document.createElement("div");
+                item.className = "user-item";
+                item.innerHTML = `
+                    <img src="${user.photo || 'https://via.placeholder.com/45'}">
+                    <div class="user-info">
+                        <h4>${user.name}</h4>
+                        <p>Online</p>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        });
+
+        document.getElementById("msg-input").addEventListener("keypress", (e) => {
+            if(e.key === "Enter") sendMsg();
         });
     </script>
 </body>
