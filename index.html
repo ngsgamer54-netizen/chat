@@ -3,31 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aesthetic Chat App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Aesthetic Global Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div class="app">
         <div id="login" class="screen">
-            <div class="card">
-                <h2>WhatsApp <span style="color: #7E57C2;">Lite</span></h2>
-                <p>Welcome to Aesthetic Chat</p> 
-                <input type="text" id="username" placeholder="Enter Your Name">
-                <button onclick="joinChat()">Start Chatting</button>
+            <div style="padding: 50px; text-align: center; margin-top: 30%;">
+                <h1 style="color: var(--purple-main); margin-bottom: 10px;">Chat App</h1>
+                <p style="color: #666; margin-bottom: 30px;">Peach & Purple Edition</p>
+                <input type="text" id="username" placeholder="Enter Your Name..." style="width: 100%; margin-bottom: 20px; padding: 15px; border-radius: 30px; border: 1px solid #ddd;">
+                <button onclick="joinChat()" style="width: 100%; padding: 15px; border-radius: 30px; background: var(--purple-main); color: white; border: none; font-weight: 600; cursor: pointer;">Start Chatting</button>
             </div>
         </div>
 
         <div id="chat" class="screen hidden">
             <header>
                 <div class="user-info">
-                    <div class="avatar">P</div>
-                    <div><h3>Global Chat</h3><small>online</small></div>
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <h3 style="font-size: 16px;">Global Chat</h3>
+                        <small style="opacity: 0.8;">Online</small>
+                    </div>
                 </div>
-                <div class="icons"><i class="fas fa-video"></i><i class="fas fa-phone"></i></div>
+                <div style="display: flex; gap: 15px; font-size: 18px;">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
             </header>
-            <div id="chat-box" class="chat-box"></div>
+
+            <div id="chat-box" class="chat-box">
+                </div>
+
             <div class="input-area">
                 <input type="text" id="msg-input" placeholder="Type a message...">
                 <button onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
