@@ -1,18 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: #dadbd3; /* WhatsApp Background Color */
+    background: #dadbd3;
 }
 
 /* WhatsApp Green Top Bar */
@@ -22,7 +17,7 @@ body::before {
     top: 0;
     width: 100%;
     height: 130px;
-    background-color: #00a884; /* WhatsApp Green */
+    background-color: #00a884;
     z-index: -1;
 }
 
@@ -36,14 +31,12 @@ body::before {
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
-/* Hidden elements */
 .hidden { display: none !important; }
 
 /* Login Screen Styles */
-#login {
+.login-screen {
     width: 100%;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     background: #f0f2f5;
@@ -53,37 +46,40 @@ body::before {
     background: white;
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Left Sidebar */
-.left-container {
-    position: relative;
-    width: 30%;
-    height: 100%;
-    border-right: 1px solid rgba(0,0,0,0.1);
-    background: #fff;
+.login-card input {
+    width: 100%;
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
-/* Right Chat Area */
-.right-container {
-    position: relative;
-    width: 70%;
-    height: 100%;
-    background: #e5ddd5;
+.login-card button {
+    width: 100%;
+    padding: 10px;
+    background: #00a884;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-/* WhatsApp Chat Background Pattern */
+/* Chat Layout */
+.left-container { width: 30%; height: 100%; border-right: 1px solid rgba(0,0,0,0.1); background: #fff; }
+.right-container { position: relative; width: 70%; height: 100%; background: #e5ddd5; }
+
+/* WhatsApp Doodle Background */
 .right-container::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-    opacity: 0.08;
+    opacity: 0.06;
 }
 
 .header {
@@ -98,14 +94,14 @@ body::before {
     z-index: 10;
 }
 
-.user-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-}
+.user-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
+.user-img img { width: 100%; object-fit: cover; }
 
-/* Chat Container */
+.nav-icons i { color: #54656f; margin-left: 20px; cursor: pointer; font-size: 1.2em; }
+
+.notif-bar { background: #76daff; padding: 15px; display: flex; align-items: center; gap: 15px; font-size: 0.8em; }
+
+/* Chat Bubbles */
 .chat-container {
     position: relative;
     width: 100%;
@@ -115,12 +111,7 @@ body::before {
     z-index: 1;
 }
 
-.message-box {
-    display: flex;
-    width: 100%;
-    margin: 5px 0;
-}
-
+.message-box { display: flex; width: 100%; margin: 5px 0; }
 .message-box p {
     position: relative;
     max-width: 65%;
@@ -131,18 +122,12 @@ body::before {
 }
 
 .my-message { justify-content: flex-end; }
-.my-message p { background: #dcf8c6; } /* WhatsApp Sent Color */
+.my-message p { background: #dcf8c6; }
 
 .friend-message { justify-content: flex-start; }
-.friend-message p { background: #fff; } /* WhatsApp Received Color */
+.friend-message p { background: #fff; }
 
-.message-box span {
-    display: block;
-    font-size: 0.75em;
-    opacity: 0.5;
-    margin-top: 4px;
-    text-align: right;
-}
+.message-box span { display: block; font-size: 0.7em; opacity: 0.5; text-align: right; margin-top: 5px; }
 
 /* Input Bar */
 .chatbox-input {
@@ -163,17 +148,6 @@ body::before {
     border-radius: 8px;
     border: none;
     outline: none;
-    font-size: 0.95em;
 }
 
-.chatbox-input i {
-    font-size: 1.5em;
-    color: #54656f;
-    cursor: pointer;
-}
-
-.send-btn {
-    background: none;
-    border: none;
-    outline: none;
-}
+.send-btn { background: none; border: none; cursor: pointer; }
