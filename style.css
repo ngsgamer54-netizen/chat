@@ -1,33 +1,112 @@
 :root {
-    --bg-theme: #E6E6FA; /* Ye wahi Lavender color hai */
-    --purple-bold: #7E57C2;
-    --peach-bubble: #FFCCBC;
+    --purple-main: #673AB7;
+    --peach-light: #FFDAB9;
+    --glass-white: rgba(255, 255, 255, 0.8);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-.app { height: 100vh; background: var(--bg-theme); display: flex; justify-content: center; align-items: center; }
+body {
+    /* Background Image jo aapne mangi thi */
+    background: url('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1000') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-.screen { width: 100%; max-width: 400px; height: 90vh; background: white; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.app { width: 100%; display: flex; justify-content: center; }
+
+.screen { 
+    width: 380px; 
+    height: 85vh; 
+    background: var(--glass-white); 
+    backdrop-filter: blur(10px); 
+    border-radius: 30px; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
 .hidden { display: none; }
 
-/* Login */
-.card { padding: 40px; text-align: center; margin-top: 50%; }
-input { width: 85%; padding: 12px; margin: 10px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #f9f9f9; }
-button { background: var(--purple-bold); color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-
 /* Header */
-header { background: var(--purple-bold); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-.user-info { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 35px; height: 35px; background: var(--peach-bubble); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #5D4037; font-weight: bold; }
+header { 
+    background: var(--purple-main); 
+    color: white; 
+    padding: 20px 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
 
-/* Chat Box */
-.chat-box { flex: 1; padding: 15px; overflow-y: auto; background: var(--bg-theme); display: flex; flex-direction: column; gap: 12px; }
-.msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 14px; position: relative; }
-.sent { align-self: flex-end; background: var(--peach-bubble); color: #444; border-bottom-right-radius: 0; }
-.received { align-self: flex-start; background: white; color: #444; border-bottom-left-radius: 0; }
+.user-info { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 40px; height: 40px; background: var(--peach-light); border-radius: 50%; color: #333; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+/* Chat Box Background (Transparent) */
+.chat-box { 
+    flex: 1; 
+    padding: 20px; 
+    overflow-y: auto; 
+    background: rgba(255, 255, 255, 0.2); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.msg { 
+    max-width: 75%; 
+    padding: 12px 18px; 
+    border-radius: 20px; 
+    font-size: 14px; 
+    line-height: 1.4;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.sent { 
+    align-self: flex-end; 
+    background: #FFCCBC; /* Peach shade from image */
+    color: #444; 
+    border-bottom-right-radius: 5px; 
+}
+
+.received { 
+    align-self: flex-start; 
+    background: white; 
+    color: #444; 
+    border-bottom-left-radius: 5px; 
+}
 
 /* Input Area */
-.input-area { padding: 15px; display: flex; background: white; gap: 10px; border-top: 1px solid #eee; }
-.input-area input { flex: 1; margin: 0; }
-.input-area button { width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+.input-area { 
+    padding: 20px; 
+    display: flex; 
+    background: white; 
+    gap: 10px; 
+    align-items: center;
+}
+
+.input-area input { 
+    flex: 1; 
+    padding: 12px 20px; 
+    border-radius: 25px; 
+    border: 1px solid #ddd; 
+    outline: none; 
+    background: #fdfdfd;
+}
+
+.input-area button { 
+    background: var(--purple-main); 
+    color: white; 
+    border: none; 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    transition: 0.3s;
+}
+
+.input-area button:hover { transform: scale(1.1); }
