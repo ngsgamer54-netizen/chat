@@ -1,14 +1,19 @@
 :root {
-    --purple-bold: #673AB7;
+    --purple-main: #673AB7;
     --peach-bubble: #FFCCBC;
+    --glass-white: rgba(255, 255, 255, 0.2); /* Transparent background for glass effect */
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif; 
+}
 
 body {
-    /* Naya Floral Background Link */
-    background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
-                url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    /* Aapki upload ki gayi image 'unnamed.png' yahan add ho gayi hai */
+    background: url('unnamed.png') no-repeat center center fixed;
     background-size: cover;
     height: 100vh;
     display: flex;
@@ -16,13 +21,18 @@ body {
     align-items: center;
 }
 
-/* Chat App Container with Glass effect */
+.app { 
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+}
+
 .screen { 
     width: 380px; 
     height: 85vh; 
-    background: rgba(255, 255, 255, 0.15); /* Transparency control */
-    backdrop-filter: blur(20px); 
-    -webkit-backdrop-filter: blur(20px);
+    background: var(--glass-white); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
     border-radius: 35px; 
     overflow: hidden; 
     display: flex; 
@@ -33,9 +43,9 @@ body {
 
 .hidden { display: none; }
 
-/* Header Styling */
+/* Header */
 header { 
-    background: var(--purple-bold); 
+    background: var(--purple-main); 
     color: white; 
     padding: 20px 15px; 
     display: flex; 
@@ -44,18 +54,32 @@ header {
 }
 
 .user-info { display: flex; align-items: center; gap: 12px; }
-.avatar { width: 42px; height: 42px; background: #FFDAB9; border-radius: 50%; color: #333; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.avatar { 
+    width: 40px; 
+    height: 40px; 
+    background: #FFDAB9; 
+    border-radius: 50%; 
+    color: #333; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+}
 
 /* Chat Box Area */
 .chat-box { 
     flex: 1; 
     padding: 20px; 
     overflow-y: auto; 
-    background: rgba(255, 255, 255, 0.1); /* Halka safed background chat ke piche */
+    background: transparent; 
     display: flex; 
     flex-direction: column; 
     gap: 15px; 
 }
+
+/* Custom Scrollbar */
+.chat-box::-webkit-scrollbar { width: 5px; }
+.chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
 .msg { 
     max-width: 75%; 
@@ -65,17 +89,47 @@ header {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.sent { align-self: flex-end; background: var(--peach-bubble); color: #444; border-bottom-right-radius: 4px; }
-.received { align-self: flex-start; background: rgba(255, 255, 255, 0.9); color: #444; border-bottom-left-radius: 4px; }
+.sent { 
+    align-self: flex-end; 
+    background: var(--peach-bubble); 
+    color: #444; 
+    border-bottom-right-radius: 4px; 
+}
 
-/* Input Styling */
+.received { 
+    align-self: flex-start; 
+    background: rgba(255, 255, 255, 0.9); 
+    color: #444; 
+    border-bottom-left-radius: 4px; 
+}
+
+/* Input Area Styling */
 .input-area { 
     padding: 20px; 
     display: flex; 
     background: white; 
     gap: 10px; 
     align-items: center;
+    border-top: 1px solid rgba(0,0,0,0.05);
 }
 
-.input-area input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #eee; outline: none; }
-.input-area button { background: var(--purple-bold); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; }
+.input-area input { 
+    flex: 1; 
+    padding: 12px 20px; 
+    border-radius: 25px; 
+    border: 1px solid #eee; 
+    outline: none; 
+}
+
+.input-area button { 
+    background: var(--purple-main); 
+    color: white; 
+    border: none; 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 50%; 
+    cursor: pointer; 
+    transition: 0.2s;
+}
+
+.input-area button:hover { transform: scale(1.1); }
