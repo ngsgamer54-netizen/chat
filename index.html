@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Lite</title>
+    <title>WhatsApp Web Clone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div class="main-container">
-        <div id="login" class="login-card">
-            <i class="fab fa-whatsapp" style="font-size: 50px; color: #00a884; margin-bottom: 20px;"></i>
-            <h2>WhatsApp Lite</h2>
-            <p style="color: #666; margin-bottom: 20px;">Enter your name to start chatting</p>
-            <input type="text" id="username" placeholder="Your Name..." style="padding: 10px; width: 100%; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 20px;">
-            <button onclick="joinChat()" style="background: #00a884; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%;">Join Chat</button>
+        <div id="login" class="login-screen">
+            <div class="login-card">
+                <i class="fab fa-whatsapp" style="font-size: 60px; color: #00a884; margin-bottom: 20px;"></i>
+                <h2>WhatsApp Lite</h2>
+                <p>Enter your name to start chatting</p>
+                <input type="text" id="username" placeholder="Enter name...">
+                <button onclick="joinChat()">Start Chatting</button>
+            </div>
         </div>
 
         <div id="chat-ui" class="hidden" style="width: 100%; display: flex;">
@@ -28,16 +30,20 @@
                         <i class="fas fa-ellipsis-v"></i>
                     </div>
                 </div>
-                <div style="background: #00a884; color: white; padding: 15px; font-size: 0.8em;">
-                    Welcome to Global Group Chat
+                <div class="notif-bar">
+                    <i class="fas fa-bell-slash"></i>
+                    <div>
+                        <p>Get notified of new messages</p>
+                        <a href="#">Turn on desktop notifications ></a>
+                    </div>
                 </div>
             </div>
 
             <div class="right-container">
                 <div class="header">
-                    <div style="display: flex; align-items: center;">
+                    <div class="img-text">
                         <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
-                        <h4 style="margin-left: 15px;">Global Chat<br><span style="font-size: 0.7em; font-weight: normal; color: #666;">online</span></h4>
+                        <h4>Global Chat<br><span>Online</span></h4>
                     </div>
                     <div class="nav-icons">
                         <i class="fas fa-search"></i>
@@ -51,7 +57,7 @@
                 <div class="chatbox-input">
                     <i class="far fa-smile"></i>
                     <input type="text" id="msg-input" placeholder="Type a message">
-                    <button class="send-btn" onclick="sendMsg()">
+                    <button onclick="sendMsg()" class="send-btn">
                         <i class="fas fa-paper-plane" style="color: #00a884;"></i>
                     </button>
                 </div>
