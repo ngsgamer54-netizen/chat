@@ -3,40 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Aesthetic Chat</title>
+    <title>WhatsApp Lite</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div class="main-container">
-        <div id="login" style="width:100%; padding:50px; text-align:center; align-self:center;">
-            <h2 style="color:#673AB7; margin-bottom:20px;">Welcome to Netizen Chat</h2>
-            <input type="text" id="username" placeholder="Enter Your Name" style="width:300px; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none;">
-            <br><br>
-            <button onclick="joinChat()" style="padding:10px 30px; border-radius:25px; border:none; background:#673AB7; color:white; font-weight:bold; cursor:pointer;">Start Chatting</button>
+        <div id="login" class="login-card">
+            <i class="fab fa-whatsapp" style="font-size: 50px; color: #00a884; margin-bottom: 20px;"></i>
+            <h2>WhatsApp Lite</h2>
+            <p style="color: #666; margin-bottom: 20px;">Enter your name to start chatting</p>
+            <input type="text" id="username" placeholder="Your Name..." style="padding: 10px; width: 100%; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 20px;">
+            <button onclick="joinChat()" style="background: #00a884; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%;">Join Chat</button>
         </div>
 
-        <div id="chat" class="right-container hidden" style="width: 100%;">
-            <div class="header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="user-img"><i class="fas fa-user" style="padding:12px; color:#555;"></i></div>
-                    <h4>Global Chat <br><span>Online</span></h4>
+        <div id="chat-ui" class="hidden" style="width: 100%; display: flex;">
+            <div class="left-container">
+                <div class="header">
+                    <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="me"></div>
+                    <div class="nav-icons">
+                        <i class="fas fa-circle-notch"></i>
+                        <i class="fas fa-comment-alt"></i>
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
                 </div>
-                <div class="nav-icons">
-                    <i class="fas fa-search" style="margin-right:15px;"></i>
-                    <i class="fas fa-ellipsis-v"></i>
+                <div style="background: #00a884; color: white; padding: 15px; font-size: 0.8em;">
+                    Welcome to Global Group Chat
                 </div>
             </div>
 
-            <div id="chat-box" class="chat-container">
+            <div class="right-container">
+                <div class="header">
+                    <div style="display: flex; align-items: center;">
+                        <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
+                        <h4 style="margin-left: 15px;">Global Chat<br><span style="font-size: 0.7em; font-weight: normal; color: #666;">online</span></h4>
+                    </div>
+                    <div class="nav-icons">
+                        <i class="fas fa-search"></i>
+                        <i class="fas fa-paperclip"></i>
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
                 </div>
 
-            <div class="chatbox-input">
-                <i class="far fa-smile"></i>
-                <i class="fas fa-paperclip"></i>
-                <input type="text" id="msg-input" placeholder="Type a message">
-                <button onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+                <div id="chat-box" class="chat-container"></div>
+
+                <div class="chatbox-input">
+                    <i class="far fa-smile"></i>
+                    <input type="text" id="msg-input" placeholder="Type a message">
+                    <button class="send-btn" onclick="sendMsg()">
+                        <i class="fas fa-paper-plane" style="color: #00a884;"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
