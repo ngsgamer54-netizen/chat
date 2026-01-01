@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Chat Aesthetic</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Professional Aesthetic Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-    <div class="app">
-        <div id="login" class="screen">
-            <div style="padding: 50px; text-align: center; margin-top: 35%;">
-                <h2 style="color: var(--purple-bold); margin-bottom: 5px;">Chat App</h2>
-                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Peach & Floral Version</p>
-                <input type="text" id="username" placeholder="Your Name..." style="width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; margin-bottom: 20px;">
-                <button onclick="joinChat()" style="width: 100%; padding: 12px; border-radius: 25px; background: var(--purple-bold); color: white; border: none; cursor: pointer; font-weight: 600;">Join Global Chat</button>
-            </div>
+    <div class="main-container">
+        <div id="login" style="width:100%; padding:50px; text-align:center; align-self:center;">
+            <h2 style="color:#673AB7; margin-bottom:20px;">Welcome to Netizen Chat</h2>
+            <input type="text" id="username" placeholder="Enter Your Name" style="width:300px; padding:12px; border-radius:25px; border:1px solid #ddd; outline:none;">
+            <br><br>
+            <button onclick="joinChat()" style="padding:10px 30px; border-radius:25px; border:none; background:#673AB7; color:white; font-weight:bold; cursor:pointer;">Start Chatting</button>
         </div>
 
-        <div id="chat" class="screen hidden">
-            <header>
-                <div class="user-info">
-                    <div class="avatar"><i class="fas fa-user-circle"></i></div>
-                    <div>
-                        <h3 style="font-size: 15px;">Global Chat</h3>
-                        <small style="opacity: 0.8;">Active Now</small>
-                    </div>
+        <div id="chat" class="right-container hidden" style="width: 100%;">
+            <div class="header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="user-img"><i class="fas fa-user" style="padding:12px; color:#555;"></i></div>
+                    <h4>Global Chat <br><span>Online</span></h4>
                 </div>
-                <div style="display: flex; gap: 15px;">
-                    <i class="fas fa-search"></i>
+                <div class="nav-icons">
+                    <i class="fas fa-search" style="margin-right:15px;"></i>
                     <i class="fas fa-ellipsis-v"></i>
                 </div>
-            </header>
+            </div>
 
-            <div id="chat-box" class="chat-box"></div>
+            <div id="chat-box" class="chat-container">
+                </div>
 
-            <div class="input-area">
-                <input type="text" id="msg-input" placeholder="Type a message...">
+            <div class="chatbox-input">
+                <i class="far fa-smile"></i>
+                <i class="fas fa-paperclip"></i>
+                <input type="text" id="msg-input" placeholder="Type a message">
                 <button onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
