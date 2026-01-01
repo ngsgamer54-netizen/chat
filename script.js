@@ -1,12 +1,15 @@
 const socket = io("https://chat-tr1m.onrender.com");
-let myName = "";
+let myName = "User";
 
 function joinChat() {
-    const input = document.getElementById("username");
-    myName = input.value.trim();
-    if (myName) {
+    // Demo ke liye hum prompt use karenge, baad mein aap Firebase use kar sakte hain
+    const person = prompt("Please enter your name for Google Login simulation:", "John Doe");
+    
+    if (person != null && person != "") {
+        myName = person;
         document.getElementById("login").classList.add("hidden");
         document.getElementById("chat-ui").classList.remove("hidden");
+        console.log("Logged in as:", myName);
     }
 }
 
@@ -23,25 +26,12 @@ function sendMsg() {
     }
 }
 
-// Enter key support
-document.getElementById("msg-input")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMsg();
-});
-
 socket.on("receive_message", (data) => {
     const box = document.getElementById("chat-box");
     const div = document.createElement("div");
     const isMe = data.user === myName;
-
     div.className = `message-box ${isMe ? "my-message" : "friend-message"}`;
-    div.innerHTML = `
-        <p>
-            <b style="font-size: 0.75em; color: #075e54; display: block;">${isMe ? "You" : data.user}</b>
-            ${data.text}
-            <span>${data.time}</span>
-        </p>
-    `;
-    
+    div.innerHTML = `<p><b style="font-size: 0.8em; color: #075e54;">${isMe ? "You" : data.user}</b><br>${data.text}<br><span style="font-size: 0.7em; float: right; opacity: 0.5;">${data.time}</span></p>`;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
 });
