@@ -1,4 +1,4 @@
-// Firebase Configuration (From your screenshot)
+// Firebase Config (From your Screenshot)
 const firebaseConfig = {
   apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
   authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -14,45 +14,43 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Socket.io Connection (Aapka Render Backend)
+// Socket Connection
 const socket = io("https://chat-tr1m.onrender.com");
-
 let myName = "";
 let myPhoto = "";
 
-// Google Login Function
-document.getElementById('google-login-btn').addEventListener('click', () => {
-    auth.signInWithPopup(provider)
-        .then((result) => {
-            const user = result.user;
-            myName = user.displayName;
-            myPhoto = user.photoURL;
+// Google Login Button Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('google-login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    myName = user.displayName;
+                    myPhoto = user.photoURL;
 
-            // Login screen chhupao aur Chat UI dikhao
-            document.getElementById("login").classList.add("hidden");
-            document.getElementById("chat-ui").classList.remove("hidden");
-            
-            // Profile picture set karein
-            const avatarImg = document.getElementById("user-avatar");
-            avatarImg.src = myPhoto;
-            avatarImg.style.display = "block";
-            
-            console.log("Welcome:", myName);
-        }).catch((error) => {
-            console.error("Login Error:", error);
-            alert("Login Failed! Make sure you added your domain in Firebase settings.");
+                    // Switch Screens
+                    document.getElementById("login").classList.add("hidden");
+                    document.getElementById("chat-ui").classList.remove("hidden");
+                    
+                    // Set Profile Photo
+                    document.getElementById("user-avatar").src = myPhoto;
+                }).catch((error) => {
+                    console.error("Login Failed:", error);
+                    alert("Please authorize your domain in Firebase settings first!");
+                });
         });
+    }
 });
 
-// Message bhejne ka function
+// Send Message
 function sendMsg() {
     const input = document.getElementById("msg-input");
-    const messageText = input.value.trim();
-    
-    if (messageText !== "") {
-        const msgData = { 
-            user: myName, 
-            text: messageText,
+    if (input.value.trim()) {
+        const msgData = {
+            user: myName,
+            text: input.value,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         socket.emit("send_message", msgData);
@@ -60,12 +58,12 @@ function sendMsg() {
     }
 }
 
-// Enter key support
+// Enter Key Support
 document.getElementById("msg-input")?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMsg();
 });
 
-// Receive Message logic
+// Receive Message
 socket.on("receive_message", (data) => {
     const box = document.getElementById("chat-box");
     const div = document.createElement("div");
