@@ -6,6 +6,10 @@
     <title>WhatsApp Web Clone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
@@ -21,20 +25,20 @@
                 <div class="instructions">
                     <h2>To use WhatsApp on your computer:</h2>
                     <ol>
-                        <li>Click on the **Google Sign In** button below.</li>
-                        <li>Select your **Gmail Account** to authenticate.</li>
-                        <li>Join the global chat securely.</li>
+                        <li>Click the button below to sign in with Google.</li>
+                        <li>This will sync your profile name and photo.</li>
+                        <li>Enjoy chatting in the global room!</li>
                     </ol>
-                    <div class="google-login-area">
-                        <button class="google-btn" onclick="joinChat()">
+                    <div class="google-login-area" style="margin-top: 40px;">
+                        <button class="google-btn" id="google-login-btn">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_勇敢_Logo.svg" alt="G">
                             <span>Sign in with Google</span>
                         </button>
                     </div>
                 </div>
                 <div class="qr-code-area">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=NetizenChat" alt="QR Code">
-                    <p>Scan to join via mobile or use Google Login</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WhatsAppClone" alt="QR Code">
+                    <p>Security verified by Google</p>
                 </div>
             </div>
         </div>
@@ -43,7 +47,7 @@
     <div id="chat-ui" class="main-container hidden">
         <div class="left-container">
             <div class="header">
-                <div class="user-img"><img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="me"></div>
+                <div class="user-img"><img id="user-avatar" src="" alt="me"></div>
                 <div class="nav-icons">
                     <i class="fas fa-circle-notch"></i>
                     <i class="fas fa-comment-alt"></i>
@@ -63,7 +67,7 @@
             <div class="header">
                 <div class="img-text">
                     <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
-                    <h4>Global Chat<br><span>Online</span></h4>
+                    <h4>Global Chat Room<br><span>Online</span></h4>
                 </div>
                 <div class="nav-icons">
                     <i class="fas fa-search"></i>
