@@ -5,20 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Web Clone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f0f2f5; height: 100vh; overflow: hidden; }
+        .hidden { display: none !important; }
+
+        /* Login Screen */
+        .whatsapp-login-container { height: 100vh; width: 100%; position: relative; }
+        .green-header { background-color: #00a884; height: 220px; width: 100%; padding: 30px 10%; color: white; }
+        .logo-area { display: flex; align-items: center; gap: 15px; font-weight: 600; font-size: 14px; }
+        .logo-area i { font-size: 35px; }
+        .login-box {
+            position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+            background: white; width: 1000px; max-width: 90%; height: 500px;
+            box-shadow: 0 17px 50px 0 rgba(0,0,0,.19); padding: 60px; border-radius: 3px;
+        }
+        .login-content { display: flex; justify-content: space-between; gap: 50px; }
+        .instructions h2 { color: #41525d; font-weight: 300; margin-bottom: 30px; }
+        .instructions ol { color: #41525d; line-height: 2.5; padding-left: 20px; }
+
+        /* Google Button Fix */
+        .google-btn {
+            display: flex; align-items: center; background: white; border: 1px solid #dadce0;
+            padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 600;
+            transition: background 0.3s;
+        }
+        .google-btn:hover { background: #f8f9fa; }
+        .google-btn img { width: 22px; height: 22px; margin-right: 15px; }
+
+        .qr-code-area { text-align: center; }
+        .qr-code-area img { width: 250px; border: 1px solid #eee; padding: 10px; }
+
+        /* Chat UI */
+        .main-container { display: flex; height: 100vh; width: 100%; }
+        .left-container { width: 30%; background: #fff; border-right: 1px solid #ddd; }
+        .right-container { width: 70%; position: relative; background: #efeae2; }
+        .right-container::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            opacity: 0.06; z-index: 0;
+        }
+        .header { position: relative; height: 60px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; }
+        .user-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
+        .user-img img { width: 100%; height: 100%; object-fit: cover; }
+        .chat-container { position: relative; height: calc(100vh - 120px); overflow-y: auto; padding: 20px 50px; display: flex; flex-direction: column; z-index: 1; }
+        .message-box { display: flex; margin: 5px 0; width: 100%; }
+        .my-message { justify-content: flex-end; }
+        .friend-message { justify-content: flex-start; }
+        .message-box p { position: relative; max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .my-message p { background: #dcf8c6; }
+        .friend-message p { background: #fff; }
+        .chatbox-input { position: relative; height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 10px; z-index: 10; }
+        .chatbox-input input { flex: 1; margin: 0 10px; padding: 12px; border-radius: 8px; border: none; outline: none; }
+    </style>
 </head>
 <body>
     <div id="login" class="whatsapp-login-container">
         <div class="green-header">
-            <div class="logo-area">
-                <i class="fab fa-whatsapp"></i>
-                <span>WHATSAPP WEB</span>
-            </div>
+            <div class="logo-area"><i class="fab fa-whatsapp"></i><span>WHATSAPP WEB</span></div>
         </div>
         <div class="login-box">
             <div class="login-content">
@@ -29,16 +80,15 @@
                         <li>This will sync your profile name and photo.</li>
                         <li>Enjoy chatting in the global room!</li>
                     </ol>
-                    <div class="google-login-area" style="margin-top: 40px;">
-                        <button class="google-btn" id="google-login-btn" type="button" style="cursor: pointer; position: relative; z-index: 100;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_勇敢_Logo.svg" alt="G" style="pointer-events: none;">
-                            <span style="pointer-events: none;">Sign in with Google</span>
+                    <div style="margin-top: 40px;">
+                        <button class="google-btn" id="google-login-btn">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Icon">
+                            <span>Sign in with Google</span>
                         </button>
                     </div>
                 </div>
                 <div class="qr-code-area">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WhatsAppClone" alt="QR Code">
-                    <p>Security verified by Google</p>
                 </div>
             </div>
         </div>
@@ -48,43 +98,69 @@
         <div class="left-container">
             <div class="header">
                 <div class="user-img"><img id="user-avatar" src="" alt="me"></div>
-                <div class="nav-icons">
-                    <i class="fas fa-circle-notch"></i>
-                    <i class="fas fa-comment-alt"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                </div>
-            </div>
-            <div class="notif-bar">
-                <i class="fas fa-bell-slash"></i>
-                <div>
-                    <p>Get notified of new messages</p>
-                    <a href="#">Turn on desktop notifications ></a>
-                </div>
+                <div style="font-size: 1.2em; color: #54656f;"><i class="fas fa-comment-alt"></i></div>
             </div>
         </div>
-
         <div class="right-container">
             <div class="header">
-                <div class="img-text">
-                    <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
-                    <h4>Global Chat Room<br><span>Online</span></h4>
-                </div>
-                <div class="nav-icons">
-                    <i class="fas fa-search"></i>
-                    <i class="fas fa-paperclip"></i>
-                    <i class="fas fa-ellipsis-v"></i>
-                </div>
+                <h4>Global Chat Room</h4>
             </div>
             <div id="chat-box" class="chat-container"></div>
             <div class="chatbox-input">
-                <i class="far fa-smile"></i>
                 <input type="text" id="msg-input" placeholder="Type a message">
-                <button onclick="sendMsg()" class="send-btn">
-                    <i class="fas fa-paper-plane" style="color: #00a884;"></i>
+                <button onclick="sendMsg()" style="border:none; background:none; cursor:pointer;">
+                    <i class="fas fa-paper-plane" style="color: #00a884; font-size: 20px;"></i>
                 </button>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
+            authDomain: "mywhatsappclone-12e96.firebaseapp.com",
+            projectId: "mywhatsappclone-12e96",
+            storageBucket: "mywhatsappclone-12e96.firebasestorage.app",
+            messagingSenderId: "131666791116",
+            appId: "1:131666791116:web:fe41ca039c1bd9a774d069"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const socket = io("https://chat-tr1m.onrender.com");
+        let myName = "";
+
+        document.getElementById('google-login-btn').onclick = () => {
+            auth.signInWithPopup(provider).then((result) => {
+                myName = result.user.displayName;
+                document.getElementById("user-avatar").src = result.user.photoURL;
+                document.getElementById("login").classList.add("hidden");
+                document.getElementById("chat-ui").classList.remove("hidden");
+            }).catch(err => alert("Error: " + err.message));
+        };
+
+        function sendMsg() {
+            const input = document.getElementById("msg-input");
+            if (input.value.trim()) {
+                socket.emit("send_message", {
+                    user: myName,
+                    text: input.value,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+                input.value = "";
+            }
+        }
+
+        socket.on("receive_message", (data) => {
+            const box = document.getElementById("chat-box");
+            const div = document.createElement("div");
+            const isMe = data.user === myName;
+            div.className = `message-box ${isMe ? "my-message" : "friend-message"}`;
+            div.innerHTML = `<p><b style="font-size:0.7em; color:#075e54;">${isMe ? "You" : data.user}</b><br>${data.text}</p>`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        });
+    </script>
 </body>
 </html>
