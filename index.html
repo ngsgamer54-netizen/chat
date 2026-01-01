@@ -9,58 +9,75 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-    <div class="main-container">
-        <div id="login" class="login-screen">
-            <div class="login-card">
-                <i class="fab fa-whatsapp" style="font-size: 60px; color: #00a884; margin-bottom: 20px;"></i>
-                <h2>WhatsApp Lite</h2>
-                <p>Enter your name to start chatting</p>
-                <input type="text" id="username" placeholder="Enter name...">
-                <button onclick="joinChat()">Start Chatting</button>
+    <div id="login" class="whatsapp-login-container">
+        <div class="green-header">
+            <div class="logo-area">
+                <i class="fab fa-whatsapp"></i>
+                <span>WHATSAPP WEB</span>
+            </div>
+        </div>
+        <div class="login-box">
+            <div class="login-content">
+                <div class="instructions">
+                    <h2>To use WhatsApp on your computer:</h2>
+                    <ol>
+                        <li>Click on the **Google Sign In** button below.</li>
+                        <li>Select your **Gmail Account** to authenticate.</li>
+                        <li>Join the global chat securely.</li>
+                    </ol>
+                    <div class="google-login-area">
+                        <button class="google-btn" onclick="joinChat()">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_勇敢_Logo.svg" alt="G">
+                            <span>Sign in with Google</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="qr-code-area">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=NetizenChat" alt="QR Code">
+                    <p>Scan to join via mobile or use Google Login</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-ui" class="main-container hidden">
+        <div class="left-container">
+            <div class="header">
+                <div class="user-img"><img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="me"></div>
+                <div class="nav-icons">
+                    <i class="fas fa-circle-notch"></i>
+                    <i class="fas fa-comment-alt"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+            <div class="notif-bar">
+                <i class="fas fa-bell-slash"></i>
+                <div>
+                    <p>Get notified of new messages</p>
+                    <a href="#">Turn on desktop notifications ></a>
+                </div>
             </div>
         </div>
 
-        <div id="chat-ui" class="hidden" style="width: 100%; display: flex;">
-            <div class="left-container">
-                <div class="header">
-                    <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="me"></div>
-                    <div class="nav-icons">
-                        <i class="fas fa-circle-notch"></i>
-                        <i class="fas fa-comment-alt"></i>
-                        <i class="fas fa-ellipsis-v"></i>
-                    </div>
+        <div class="right-container">
+            <div class="header">
+                <div class="img-text">
+                    <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
+                    <h4>Global Chat<br><span>Online</span></h4>
                 </div>
-                <div class="notif-bar">
-                    <i class="fas fa-bell-slash"></i>
-                    <div>
-                        <p>Get notified of new messages</p>
-                        <a href="#">Turn on desktop notifications ></a>
-                    </div>
+                <div class="nav-icons">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-paperclip"></i>
+                    <i class="fas fa-ellipsis-v"></i>
                 </div>
             </div>
-
-            <div class="right-container">
-                <div class="header">
-                    <div class="img-text">
-                        <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt="group"></div>
-                        <h4>Global Chat<br><span>Online</span></h4>
-                    </div>
-                    <div class="nav-icons">
-                        <i class="fas fa-search"></i>
-                        <i class="fas fa-paperclip"></i>
-                        <i class="fas fa-ellipsis-v"></i>
-                    </div>
-                </div>
-
-                <div id="chat-box" class="chat-container"></div>
-
-                <div class="chatbox-input">
-                    <i class="far fa-smile"></i>
-                    <input type="text" id="msg-input" placeholder="Type a message">
-                    <button onclick="sendMsg()" class="send-btn">
-                        <i class="fas fa-paper-plane" style="color: #00a884;"></i>
-                    </button>
-                </div>
+            <div id="chat-box" class="chat-container"></div>
+            <div class="chatbox-input">
+                <i class="far fa-smile"></i>
+                <input type="text" id="msg-input" placeholder="Type a message">
+                <button onclick="sendMsg()" class="send-btn">
+                    <i class="fas fa-paper-plane" style="color: #00a884;"></i>
+                </button>
             </div>
         </div>
     </div>
