@@ -32,14 +32,15 @@
         .instructions h2 { color: #41525d; font-weight: 300; margin-bottom: 25px; font-size: 28px; }
         .instructions ol { color: #41525d; line-height: 2.2; padding-left: 20px; font-size: 16px; }
 
-        /* Google Button Fix - Modern Style */
+        /* Google Button with SVG Icon */
         .google-btn {
             display: flex; align-items: center; background: #ffffff; border: 1px solid #747775;
             padding: 12px 24px; border-radius: 20px; cursor: pointer; font-weight: 500;
             margin-top: 35px; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            outline: none;
         }
         .google-btn:hover { background: #f1f3f4; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .google-btn i { font-size: 20px; margin-right: 12px; color: #4285F4; }
+        .google-btn svg { width: 20px; height: 20px; margin-right: 12px; }
         .google-btn span { color: #1f1f1f; font-size: 15px; letter-spacing: 0.25px; }
 
         .qr-area { text-align: center; }
@@ -49,17 +50,17 @@
         .main-container { display: flex; height: 100vh; width: 100%; }
         .left-container { width: 30%; background: #fff; border-right: 1px solid #ddd; }
         .right-container { width: 70%; position: relative; background: #efeae2; }
-        .header { position: relative; height: 60px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; }
+        .header { height: 60px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; border-bottom: 1px solid rgba(0,0,0,0.08); }
         .user-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #ccc; }
         .user-img img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-container { position: relative; height: calc(100vh - 120px); overflow-y: auto; padding: 20px 50px; display: flex; flex-direction: column; z-index: 1; }
+        .chat-container { height: calc(100vh - 120px); overflow-y: auto; padding: 20px 50px; display: flex; flex-direction: column; z-index: 1; }
         .message-box { display: flex; margin: 5px 0; width: 100%; }
         .my-message { justify-content: flex-end; }
         .friend-message { justify-content: flex-start; }
         .message-box p { position: relative; max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 0.9em; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
         .my-message p { background: #dcf8c6; }
         .friend-message p { background: #fff; }
-        .chatbox-input { position: relative; height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 10px; z-index: 10; }
+        .chatbox-input { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 10px; z-index: 10; }
         .chatbox-input input { flex: 1; margin: 0 10px; padding: 12px; border-radius: 8px; border: none; outline: none; }
     </style>
 </head>
@@ -73,12 +74,12 @@
                 <div class="instructions">
                     <h2>Use WhatsApp on your computer</h2>
                     <ol>
-                        <li>Open this page on your browser.</li>
-                        <li>Click the <b>Google Icon</b> button below.</li>
-                        <li>Sign in to join the Global Chat securely.</li>
+                        <li>Click the <b>Sign in with Google</b> button.</li>
+                        <li>Authenticate with your Gmail account.</li>
+                        <li>Join the global room instantly.</li>
                     </ol>
                     <button class="google-btn" id="google-login-btn">
-                        <i class="fab fa-google"></i>
+                        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
                         <span>Sign in with Google</span>
                     </button>
                 </div>
@@ -101,7 +102,7 @@
             <div class="header">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <div class="user-img"><img src="https://cdn-icons-png.flaticon.com/512/166/166258.png" alt=""></div>
-                    <h4 id="display-name">Global Chat Room</h4>
+                    <h4>Global Chat Room</h4>
                 </div>
             </div>
             <div id="chat-box" class="chat-container"></div>
@@ -116,7 +117,6 @@
     </div>
 
     <script>
-        // Firebase Config (Verified from your screenshot)
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
             authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -126,28 +126,26 @@
             appId: "1:131666791116:web:fe41ca039c1bd9a774d069"
         };
 
-        // Initialize
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
         const socket = io("https://chat-tr1m.onrender.com");
         let myName = "";
 
-        // Login Action
-        document.getElementById('google-login-btn').onclick = () => {
+        // Sign In Logic
+        document.getElementById('google-login-btn').addEventListener('click', function() {
             auth.signInWithPopup(provider).then((result) => {
-                const user = result.user;
-                myName = user.displayName;
-                document.getElementById("user-avatar").src = user.photoURL;
+                myName = result.user.displayName;
+                document.getElementById("user-avatar").src = result.user.photoURL;
                 document.getElementById("login").classList.add("hidden");
                 document.getElementById("chat-ui").classList.remove("hidden");
             }).catch(err => {
-                console.error(err);
-                alert("Login Error: Make sure your domain is authorized in Firebase Settings.");
+                if (err.code !== 'auth/cancelled-popup-request') {
+                    alert("Login Error: " + err.message);
+                }
             });
-        };
+        });
 
-        // Chat Action
         function sendMsg() {
             const input = document.getElementById("msg-input");
             if (input.value.trim() && myName) {
@@ -160,10 +158,6 @@
             }
         }
 
-        // Enter key to send
-        document.getElementById("msg-input").onkeypress = (e) => { if(e.key === "Enter") sendMsg(); };
-
-        // Listen for messages
         socket.on("receive_message", (data) => {
             const box = document.getElementById("chat-box");
             const div = document.createElement("div");
