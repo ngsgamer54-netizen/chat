@@ -1,4 +1,4 @@
-// Firebase Config (From your Screenshot)
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
   authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -19,35 +19,36 @@ const socket = io("https://chat-tr1m.onrender.com");
 let myName = "";
 let myPhoto = "";
 
-// Google Login Button Logic
-document.addEventListener('DOMContentLoaded', () => {
+// Yeh function check karega ki button click ho raha hai ya nahi
+window.onload = function() {
     const loginBtn = document.getElementById('google-login-btn');
+    
     if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
+        loginBtn.onclick = function() {
+            console.log("Button Clicked!"); // Console mein check karne ke liye
             auth.signInWithPopup(provider)
                 .then((result) => {
                     const user = result.user;
                     myName = user.displayName;
                     myPhoto = user.photoURL;
 
-                    // Switch Screens
                     document.getElementById("login").classList.add("hidden");
                     document.getElementById("chat-ui").classList.remove("hidden");
-                    
-                    // Set Profile Photo
                     document.getElementById("user-avatar").src = myPhoto;
                 }).catch((error) => {
-                    console.error("Login Failed:", error);
-                    alert("Please authorize your domain in Firebase settings first!");
+                    console.error("Auth Error:", error);
+                    alert("Error: " + error.message);
                 });
-        });
+        };
+    } else {
+        console.log("Button not found in HTML!");
     }
-});
+};
 
 // Send Message
 function sendMsg() {
     const input = document.getElementById("msg-input");
-    if (input.value.trim()) {
+    if (input.value.trim() && myName) {
         const msgData = {
             user: myName,
             text: input.value,
@@ -57,11 +58,6 @@ function sendMsg() {
         input.value = "";
     }
 }
-
-// Enter Key Support
-document.getElementById("msg-input")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMsg();
-});
 
 // Receive Message
 socket.on("receive_message", (data) => {
