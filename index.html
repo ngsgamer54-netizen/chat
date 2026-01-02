@@ -3,55 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web - Professional Edition</title>
+    <title>WhatsApp Web - QR Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f0f2f5; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        body::before { content: ""; position: absolute; top: 0; width: 100%; height: 222px; background: #00a884; z-index: -1; }
+        .login-box { background: white; width: 1000px; height: 550px; display: flex; box-shadow: 0 17px 50px rgba(0,0,0,0.2); border-radius: 3px; }
+        .login-left { flex: 1.5; padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+        .login-right { flex: 1; display: flex; align-items: center; justify-content: center; border-left: 1px solid #f2f2f2; padding: 40px; }
+        .qr-frame { width: 280px; height: 280px; padding: 15px; border: 1px solid #eee; background: white; }
+        .btn-google { background: #008069; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 12px; margin-top: 40px; }
         .hidden { display: none !important; }
-        /* Professional Login UI (ipll.jpeg style) */
-        #login-page { height: 100vh; background: #00a884; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; width: 850px; height: 480px; display: flex; border-radius: 3px; box-shadow: 0 17px 50px rgba(0,0,0,0.19); }
-        .login-info { flex: 1.5; padding: 60px; }
-        .login-qr { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; border-left: 1px solid #f2f2f2; }
-        .qr-img { width: 240px; height: 240px; padding: 10px; border: 1px solid #eee; }
-        .google-btn { background: #008069; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 30px; display: flex; align-items: center; gap: 10px; }
-        /* Chat UI */
-        #main-app { display: flex; height: 100vh; }
-        .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; }
-        .chat-area { width: 70%; background: #efeae2; }
+        #app-area { width: 100%; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-    <div id="login-page">
-        <div class="login-box">
-            <div class="login-info">
-                <h1 style="color: #41525d; font-weight: 300;">Login to Start Chatting</h1>
-                <p style="color: #667781; margin-top: 25px; font-size: 18px;">Connect with everyone in the global room.</p>
-                <button class="google-btn" onclick="startGoogleLogin()">
-                    <i class="fab fa-google"></i> Sign in with Google
-                </button>
-            </div>
-            <div class="login-qr">
-                <div class="qr-img">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=WhatsApp" style="width:100%;">
-                </div>
-            </div>
+
+    <div id="login-page" class="login-box">
+        <div class="login-left">
+            <h1 style="color:#41525d; font-size: 28px; font-weight: 300;">Login to Start Chatting</h1>
+            <p style="color:#667781; font-size: 18px; margin-top: 20px;">Connect with everyone in the global room.</p>
+            <button class="btn-google" onclick="doLogin()">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
         </div>
-    </div>
-    <div id="main-app" class="hidden">
-        <div class="sidebar">
-            <div style="padding:15px; background:#f0f2f5;"><b>Online Users</b></div>
-            <div id="user-list"></div>
-        </div>
-        <div class="chat-area">
-            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between;">
-                <span id="target-name">Select Contact</span>
+        <div class="login-right">
+            <div class="qr-frame">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WhatsApp" style="width:100%;">
             </div>
         </div>
     </div>
+
+    <div id="app-area" class="hidden">
+        <div style="text-align: center; color: #00a884;">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p style="margin-top: 15px; font-size: 20px;">Setting up your chats...</p>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
@@ -62,16 +55,19 @@
             appId: "1:131666791116:web:fe41ca039c1bd9a774d069"
         };
         firebase.initializeApp(firebaseConfig);
-        function startGoogleLogin() {
+
+        function doLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(e => alert("Error: " + e.message));
+            firebase.auth().signInWithPopup(provider).catch(err => {
+                alert("Login Error: " + err.message + "\nCheck if domain is authorized in Firebase!");
+            });
         }
+
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                const socket = io("https://chat-tr1m.onrender.com");
-                socket.emit("user_join", { name: user.displayName, photo: user.photoURL });
+                document.getElementById('app-area').classList.remove('hidden');
+                document.body.style.background = "#fff";
             }
         });
     </script>
