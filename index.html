@@ -3,60 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Clone - Multi User</title>
+    <title>WhatsApp Clone - Final Stable</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .hidden { display: none !important; }
-        body { background-color: #f0f2f5; height: 100vh; overflow: hidden; display: flex; }
+        body { background-color: #f0f2f5; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 
-        /* Sidebar Styles */
-        .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: #fff; }
+        /* Login Screen */
+        #login-page { width: 100%; height: 100%; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; position: fixed; }
+        .btn-google { background: #008069; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        /* Main App Layout */
+        #chat-app { width: 100vw; height: 100vh; display: flex; background: #fff; }
+        
+        /* Sidebar */
+        .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: #fff; min-width: 300px; }
         .side-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
         .user-list { flex: 1; overflow-y: auto; }
-        .user-card { padding: 12px 16px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #f2f2f2; transition: 0.3s; }
+        .user-card { padding: 12px 16px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #f2f2f2; }
         .user-card:hover { background: #f5f6f6; }
-        .user-card img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .user-card img { width: 45px; height: 45px; border-radius: 50%; }
 
-        /* Chat Window */
+        /* Main Chat Window */
         .main-chat { width: 70%; background: #efeae2; display: flex; flex-direction: column; position: relative; }
-        .chat-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .call-icons i { font-size: 20px; color: #54656f; cursor: pointer; margin-left: 20px; }
+        .chat-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; z-index: 5; }
+        .call-icons i { font-size: 20px; color: #54656f; cursor: pointer; margin-left: 25px; }
 
-        /* Call Screen */
+        /* Calling Screen Overlay */
         #call-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0b141a; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        video { width: 80%; max-width: 500px; border-radius: 10px; border: 2px solid #00a884; }
+        video { width: 90%; max-width: 500px; border-radius: 15px; border: 2px solid #00a884; background: #000; }
+        .end-btn { background: #f44336; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 30px; font-size: 24px; }
 
-        /* Message Box */
-        #msg-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        /* Messages */
+        #msg-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
         .msg.sent { align-self: flex-end; background: #d9fdd3; }
         .msg.received { align-self: flex-start; background: #fff; }
 
+        /* Input Area */
         .input-bar { background: #f0f2f5; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
-        #msg-input { flex: 1; padding: 10px; border-radius: 20px; border: none; outline: none; }
+        #msg-input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; outline: none; }
     </style>
 </head>
 <body>
 
-    <div id="chat-app" style="width:100vw; height:100vh; display:flex;">
+    <div id="login-page">
+        <h1 style="color:#41525d; margin-bottom: 20px;">WhatsApp Web Clone</h1>
+        <button class="btn-google" onclick="login()">
+            <i class="fab fa-google"></i> Sign in with Google
+        </button>
+    </div>
+
+    <div id="chat-app" class="hidden">
         <div class="sidebar">
             <div class="side-header">
-                <img id="my-pic" style="width:40px; border-radius:50%;">
-                <i class="fas fa-sign-out-alt" onclick="firebase.auth().signOut()" style="cursor:pointer"></i>
+                <img id="my-pic" style="width:40px; border-radius:50%;" src="">
+                <i class="fas fa-sign-out-alt" style="cursor:pointer; color:#54656f; font-size:18px;" onclick="logout()"></i>
             </div>
-            <div style="padding:15px; color:#00a884; font-weight:bold;">USERS ONLINE</div>
+            <div style="padding:15px; color:#00a884; font-weight:bold; border-bottom:1px solid #eee;">CONTACTS</div>
             <div id="user-list" class="user-list"></div>
         </div>
 
         <div class="main-chat">
             <div class="chat-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img id="chat-user-img" src="https://cdn-icons-png.flaticon.com/512/147/147144.png" style="width:40px; border-radius:50%;">
-                    <b id="chat-user-name">Global Chat Room</b>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <img id="header-img" src="https://cdn-icons-png.flaticon.com/512/147/147144.png" style="width:40px; border-radius:50%;">
+                    <div><b id="header-name">Global Chat</b><br><small style="color:#00a884;">online</small></div>
                 </div>
                 <div class="call-icons">
                     <i class="fas fa-phone-alt" onclick="startCall('audio')"></i>
@@ -66,16 +82,15 @@
 
             <div id="call-screen" class="hidden">
                 <h2 id="call-status">Calling...</h2>
-                <video id="my-video" autoplay muted playsinline></video>
-                <div style="margin-top:20px;">
-                    <button onclick="stopCall()" style="background:#f44336; border:none; color:white; padding:15px; border-radius:50%; cursor:pointer;"><i class="fas fa-phone-slash"></i></button>
-                </div>
+                <video id="my-video" autoplay playsinline></video>
+                <div class="end-btn" onclick="stopCall()"><i class="fas fa-phone-slash"></i></div>
             </div>
 
             <div id="msg-container"></div>
+
             <div class="input-bar">
                 <input type="text" id="msg-input" placeholder="Type a message">
-                <i class="fas fa-paper-plane" onclick="sendMsg()" style="cursor:pointer; color:#54656f;"></i>
+                <i class="fas fa-paper-plane" onclick="sendMsg()" style="color:#54656f; cursor:pointer; font-size:20px;"></i>
             </div>
         </div>
     </div>
@@ -91,67 +106,101 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let currentStream;
+        const auth = firebase.auth();
+        let localStream;
 
-        firebase.auth().onAuthStateChanged(user => {
+        // --- AUTH FUNCTIONS ---
+        function login() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(e => alert("Login Error: " + e.message));
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
+
+        auth.onAuthStateChanged(user => {
             if (user) {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('chat-app').classList.remove('hidden');
                 document.getElementById('my-pic').src = user.photoURL;
-                // Save User Profile to Firestore
+                
+                // Save user info
                 db.collection("users").doc(user.uid).set({
                     name: user.displayName,
                     photo: user.photoURL,
-                    online: true
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
                 loadUsers();
                 loadMessages();
             } else {
-                window.location.reload();
+                document.getElementById('login-page').classList.remove('hidden');
+                document.getElementById('chat-app').classList.add('hidden');
             }
         });
 
-        // Load all users who have logged in
+        // --- USER LISTING ---
         function loadUsers() {
             db.collection("users").onSnapshot(snap => {
                 const list = document.getElementById('user-list');
                 list.innerHTML = "";
                 snap.forEach(doc => {
                     const data = doc.data();
-                    if(doc.id !== firebase.auth().currentUser.uid) {
+                    if(doc.id !== auth.currentUser.uid) {
                         list.innerHTML += `
-                            <div class="user-card" onclick="selectUser('${data.name}', '${data.photo}')">
+                            <div class="user-card" onclick="selectChat('${data.name}', '${data.photo}')">
                                 <img src="${data.photo}">
-                                <div><b>${data.name}</b><br><small style="color:#00a884;">Online</small></div>
+                                <div><b>${data.name}</b><br><small style="color:gray;">Hey there!</small></div>
                             </div>`;
                     }
                 });
             });
         }
 
-        function selectUser(name, img) {
-            document.getElementById('chat-user-name').innerText = name;
-            document.getElementById('chat-user-img').src = img;
+        function selectChat(name, img) {
+            document.getElementById('header-name').innerText = name;
+            document.getElementById('header-img').src = img;
         }
 
-        // Call & Chat functions (Keep existing logic)
-        async function startCall(mode) {
-            document.getElementById('call-screen').classList.remove('hidden');
+        // --- CALLING SYSTEM ---
+        async function startCall(type) {
+            const callScreen = document.getElementById('call-screen');
+            const videoArea = document.getElementById('my-video');
+            callScreen.classList.remove('hidden');
+            document.getElementById('call-status').innerText = (type === 'video' ? "Video Call..." : "Voice Call...");
+
             try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: mode==='video', audio: true });
-                document.getElementById('my-video').srcObject = currentStream;
-            } catch(e) { alert("Access denied!"); stopCall(); }
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: type === 'video',
+                    audio: true
+                });
+                videoArea.srcObject = localStream;
+                videoArea.style.display = (type === 'video' ? 'block' : 'none');
+            } catch (err) {
+                alert("Please Allow Camera/Mic Permission!");
+                stopCall();
+            }
         }
 
         function stopCall() {
-            if(currentStream) currentStream.getTracks().forEach(t => t.stop());
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
             document.getElementById('call-screen').classList.add('hidden');
         }
 
+        // --- MESSAGING ---
         function sendMsg() {
             const input = document.getElementById('msg-input');
-            const user = firebase.auth().currentUser;
             if (input.value.trim() !== "") {
                 db.collection("messages").add({
-                    text: input.value, sender: user.displayName, uid: user.uid, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    text: input.value,
+                    sender: auth.currentUser.displayName,
+                    uid: auth.currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 input.value = "";
             }
@@ -163,13 +212,18 @@
                 container.innerHTML = "";
                 snap.forEach(doc => {
                     const data = doc.data();
-                    const isMe = data.uid === firebase.auth().currentUser.uid;
-                    container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">
-                        <small style="color:#00a884; font-weight:bold;">${data.sender}</small><br>${data.text}</div>`;
+                    const isMe = data.uid === auth.currentUser.uid;
+                    container.innerHTML += `
+                        <div class="msg ${isMe ? 'sent' : 'received'}">
+                            <small style="color:#00a884; font-weight:bold;">${data.sender}</small><br>
+                            ${data.text}
+                        </div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
         }
+
+        document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
     </script>
 </body>
 </html>
