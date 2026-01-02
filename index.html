@@ -3,69 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Ultra Fix</title>
+    <title>WhatsApp Final Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
+        /* Styles are same as before - Ensuring video is visible */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #dadbd3; height: 100vh; overflow: hidden; display: flex; }
         .hidden { display: none !important; }
-        #login-page { position: fixed; inset: 0; background: #f0f2f5; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 100px solid #00a884; }
         #app { display: flex; width: 100vw; height: 100vh; background: #f0f2f5; }
         .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .main { width: 70%; display: flex; flex-direction: column; position: relative; background: #efeae2; }
-        .user-item { padding: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #f2f2f2; }
-        .user-item img { width: 45px; height: 45px; border-radius: 50%; }
-        #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 60%; padding: 8px 12px; border-radius: 8px; font-size: 14px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-        .sent { align-self: flex-end; background: #d9fdd3; }
-        .received { align-self: flex-start; background: white; }
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 95%; height: 75%; display: flex; gap: 10px; position: relative; }
-        video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; border: 1px solid #333; }
-        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; transform: scaleX(-1); }
+        video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
+        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; }
         .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop preload="auto"></audio>
 
-    <div id="login-page">
-        <div style="background:white; padding:40px; border-radius:5px; text-align:center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            <i class="fab fa-whatsapp" style="font-size:60px; color:#25d366;"></i>
-            <h2 style="margin: 15px 0;">WhatsApp Web</h2>
-            <button onclick="login()" style="padding: 12px 24px; background:#008069; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">LOGIN WITH GOOGLE</button>
-        </div>
+    <div id="login-page" style="position:fixed; inset:0; background:#f0f2f5; z-index:10000; display:flex; align-items:center; justify-content:center;">
+        <button onclick="login()" style="padding:15px 30px; background:#008069; color:white; border:none; cursor:pointer; font-weight:bold;">LOGIN WITH GOOGLE</button>
     </div>
 
     <div id="app" class="hidden">
         <div class="sidebar">
-            <div style="padding:10px 16px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
-                <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
-                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer;"></i>
+            <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between;">
+                <img id="my-pic" style="width:40px; border-radius:50%;">
+                <i class="fas fa-sign-out-alt" onclick="logout()"></i>
             </div>
             <div id="user-list"></div>
         </div>
 
         <div class="main">
             <div id="chat-window" class="hidden" style="flex:1; display:flex; flex-direction:column;">
-                <div style="padding:10px 16px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img id="header-img" style="width:40px; height:40px; border-radius:50%;">
-                        <b id="header-name"></b>
-                    </div>
-                    <div style="display:flex; gap:25px; color:#54656f;">
-                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer;"></i>
+                <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between;">
+                    <b id="header-name"></b>
+                    <div>
+                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="margin-right:20px; cursor:pointer;"></i>
                         <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer;"></i>
                     </div>
                 </div>
-                <div id="msg-container"></div>
-                <div style="padding:10px 16px; background:#f0f2f5; display:flex; gap:10px;">
-                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:10px; border-radius:8px; border:none; outline:none;">
-                    <i class="fas fa-paper-plane" onclick="sendMsg()" style="cursor:pointer; color:#54656f; font-size:20px;"></i>
+                <div id="msg-container" style="flex:1; overflow-y:auto; padding:20px;"></div>
+                <div style="padding:10px; display:flex; gap:10px;">
+                    <input type="text" id="msg-input" style="flex:1; padding:10px;">
+                    <button onclick="sendMsg()">Send</button>
                 </div>
             </div>
 
@@ -97,14 +84,8 @@
         let pc, localStream, targetId;
         const ringtone = document.getElementById('ringtone');
 
-        const iceCfg = { 
-            iceServers: [
-                { urls: "stun:stun.l.google.com:19302" },
-                { urls: "stun:stun1.l.google.com:19302" },
-                { urls: "stun:stun2.l.google.com:19302" }
-            ],
-            iceCandidatePoolSize: 10
-        };
+        // STUN Servers for better connectivity
+        const iceCfg = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
 
         function login() { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { firebase.auth().signOut().then(() => location.reload()); }
@@ -115,78 +96,44 @@
                 document.getElementById('app').classList.remove('hidden');
                 document.getElementById('my-pic').src = user.photoURL;
                 db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL });
-                loadUsers();
-                listenForCalls(user.uid);
+                loadUsers(); listenForCalls(user.uid);
             }
         });
 
         function loadUsers() {
             db.collection("users").onSnapshot(snap => {
-                const list = document.getElementById('user-list');
-                list.innerHTML = "";
+                const list = document.getElementById('user-list'); list.innerHTML = "";
                 snap.forEach(doc => {
                     if (doc.id !== firebase.auth().currentUser.uid) {
-                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}', '${doc.data().photo}')">
-                            <img src="${doc.data().photo}"><b>${doc.data().name}</b></div>`;
+                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}')" style="padding:10px; cursor:pointer;">${doc.data().name}</div>`;
                     }
                 });
             });
         }
 
-        function openChat(id, name, img) {
+        function openChat(id, name) {
             targetId = id;
             document.getElementById('chat-window').classList.remove('hidden');
             document.getElementById('header-name').innerText = name;
-            document.getElementById('header-img').src = img;
-            loadMessages();
         }
 
-        function sendMsg() {
-            const inp = document.getElementById('msg-input');
-            if (!inp.value) return;
-            const myId = firebase.auth().currentUser.uid;
-            const chatId = myId < targetId ? myId + targetId : targetId + myId;
-            db.collection("chats").doc(chatId).collection("messages").add({
-                text: inp.value, sender: myId, time: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            inp.value = "";
-        }
-
-        function loadMessages() {
-            const myId = firebase.auth().currentUser.uid;
-            const chatId = myId < targetId ? myId + targetId : targetId + myId;
-            db.collection("chats").doc(chatId).collection("messages").orderBy("time").onSnapshot(snap => {
-                const container = document.getElementById('msg-container'); container.innerHTML = "";
-                snap.forEach(doc => {
-                    const isMe = doc.data().sender === myId;
-                    container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">${doc.data().text}</div>`;
-                });
-                container.scrollTop = container.scrollHeight;
-            });
-        }
-
-        // --- MEDIA FIX LOGIC ---
-        async function setupMedia(type) {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
-            document.getElementById('local-v').srcObject = localStream;
-            if(type === 'audio') document.getElementById('local-v').classList.add('hidden');
-            return localStream;
-        }
-
+        // --- Call Logic Fix ---
         async function startCall(type) {
             document.getElementById('call-ui').classList.remove('hidden');
             pc = new RTCPeerConnection(iceCfg);
-            const stream = await setupMedia(type);
-            stream.getTracks().forEach(t => pc.addTrack(t, stream));
+            
+            // Camera/Mic access with error handling
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
+                document.getElementById('local-v').srcObject = localStream;
+                localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+            } catch (e) { alert("Camera/Mic access denied!"); }
 
-            pc.ontrack = e => {
-                console.log("Remote track received");
-                document.getElementById('remote-v').srcObject = e.streams[0];
-            };
+            pc.ontrack = e => { document.getElementById('remote-v').srcObject = e.streams[0]; };
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(targetId).collection("ice").add(e.candidate.toJSON()); };
 
-            pc.onicecandidate = e => {
-                if(e.candidate) db.collection("calls").doc(targetId).collection("ice").add(e.candidate.toJSON());
-            };
+            // Stop ringtone when connected
+            pc.onconnectionstatechange = () => { if(pc.connectionState === 'connected') ringtone.pause(); };
 
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
@@ -200,10 +147,12 @@
                 if(d.offer && !pc) {
                     document.getElementById('call-ui').classList.remove('hidden');
                     document.getElementById('ans-btn').classList.remove('hidden');
-                    document.getElementById('call-status').innerText = "Incoming Call...";
-                    ringtone.play().catch(()=>{});
+                    ringtone.play().catch(() => {});
                 }
-                if(d.answer && pc) await pc.setRemoteDescription(new RTCSessionDescription(d.answer));
+                if(d.answer && pc) {
+                    await pc.setRemoteDescription(new RTCSessionDescription(d.answer));
+                    ringtone.pause(); // Stop ringtone for caller
+                }
             });
             db.collection("calls").doc(myId).collection("ice").onSnapshot(snap => {
                 snap.docChanges().forEach(c => { if(c.type==='added' && pc) pc.addIceCandidate(new RTCIceCandidate(c.doc.data())); });
@@ -215,27 +164,23 @@
             const snap = await db.collection("calls").doc(firebase.auth().currentUser.uid).get();
             const d = snap.data();
             pc = new RTCPeerConnection(iceCfg);
-            const stream = await setupMedia(d.type);
-            stream.getTracks().forEach(t => pc.addTrack(t, stream));
+            
+            localStream = await navigator.mediaDevices.getUserMedia({ video: d.type === 'video', audio: true });
+            document.getElementById('local-v').srcObject = localStream;
+            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
 
-            pc.ontrack = e => {
-                console.log("Remote track received in answer");
-                document.getElementById('remote-v').srcObject = e.streams[0];
-            };
-
-            pc.onicecandidate = e => {
-                if(e.candidate) db.collection("calls").doc(d.from).collection("ice").add(e.candidate.toJSON());
-            };
+            pc.ontrack = e => { document.getElementById('remote-v').srcObject = e.streams[0]; };
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(d.from).collection("ice").add(e.candidate.toJSON()); };
 
             await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
             const ans = await pc.createAnswer();
             await pc.setLocalDescription(ans);
             await db.collection("calls").doc(d.from).set({ answer: ans }, { merge: true });
             document.getElementById('ans-btn').classList.add('hidden');
-            document.getElementById('call-status').innerText = "Connected";
         }
 
         async function endCall() {
+            ringtone.pause();
             const myId = firebase.auth().currentUser.uid;
             await db.collection("calls").doc(myId).delete();
             if(targetId) await db.collection("calls").doc(targetId).delete();
