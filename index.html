@@ -3,41 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Fixed</title>
+    <title>WhatsApp Web - Calling Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <style>
-        body { margin: 0; font-family: sans-serif; background: #f0f2f5; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .hidden { display: none !important; }
-        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: #00a884; }
-        .card { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .btn { background: #4285F4; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
-        #main-app { display: flex; height: 100vh; }
-        .sidebar { width: 30%; background: white; border-right: 1px solid #ccc; }
-        .chat { width: 70%; background: #efeae2; }
+
+        /* Login Page UI (Matches ipll.jpeg) */
+        #login-page {
+            height: 100vh; background-color: #00a884;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            background: white; width: 900px; height: 500px; border-radius: 3px;
+            display: flex; box-shadow: 0 17px 50px 0 rgba(0,0,0,.19), 0 12px 15px 0 rgba(0,0,0,.24);
+        }
+        .login-left { flex: 1.5; padding: 60px; }
+        .login-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+        .qr-placeholder { width: 260px; height: 260px; background: white; padding: 10px; border: 1px solid #eee; }
+        
+        .btn-google {
+            background: #008069; color: white; border: none; padding: 12px 25px;
+            border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; margin-top: 30px;
+        }
+
+        /* App Layout */
+        #main-app { display: flex; height: 100vh; background: #f0f2f5; }
+        .side-panel { width: 30%; background: white; border-right: 1px solid #d1d7db; }
+        .chat-panel { width: 70%; display: flex; flex-direction: column; background: #efeae2; }
+        .header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; justify-content: space-between; border-bottom: 1px solid #d1d7db; }
+        .user-list-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f2f2f2; }
+        .user-list-item:hover { background: #f5f6f6; }
+        .user-list-item img { width: 49px; height: 49px; border-radius: 50%; margin-right: 15px; }
+
+        /* Calling Icons */
+        .call-icons i { color: #54656f; font-size: 20px; cursor: pointer; margin-left: 25px; }
     </style>
 </head>
 <body>
 
     <div id="login-page">
-        <div class="card">
-            <h2>WhatsApp Clone</h2>
-            <p id="status-text">Please login to continue</p>
-            <button class="btn" onclick="startLogin()">Sign in with Google</button>
+        <div class="login-card">
+            <div class="login-left">
+                <h1 style="color: #41525d; font-weight: 300; font-size: 28px;">Login to Start Chatting</h1>
+                <p style="color: #667781; margin-top: 20px; font-size: 18px;">Connect with everyone in the global room.</p>
+                <button class="btn-google" onclick="login()">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+            </div>
+            <div class="login-right">
+                <div class="qr-placeholder">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=WhatsAppClone" alt="QR Code" style="width: 100%;">
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
-        <div class="sidebar">
-            <div style="padding:20px; background:#eee;"><b>Online Users</b></div>
+        <div class="side-panel">
+            <div class="header">
+                <img id="my-avatar" style="width: 40px; border-radius: 50%;">
+                <span style="font-weight: 600;">WhatsApp Web</span>
+            </div>
             <div id="user-list"></div>
         </div>
-        <div class="chat">
-            <div id="header" style="padding:20px; background:#eee;">Select User</div>
-            <div id="messages" style="height:80%; overflow-y:auto; padding:20px;"></div>
+        <div class="chat-panel">
+            <div class="header">
+                <div id="active-user-info" style="font-weight: 500;">Select a contact</div>
+                <div class="call-icons hidden" id="calling-tools">
+                    <i class="fas fa-video" title="Video Call" onclick="alert('Starting Video Call...')"></i>
+                    <i class="fas fa-phone-alt" title="WiFi Call" onclick="alert('Starting Voice Call...')"></i>
+                </div>
+            </div>
+            <div style="flex: 1;"></div>
         </div>
     </div>
 
@@ -52,29 +95,38 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        function startLogin() {
+        function login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-                .then((res) => { console.log("Logged In"); })
-                .catch((err) => { 
-                    alert("Error: " + err.message);
-                    document.getElementById('status-text').innerText = "Auth Error: " + err.code;
-                });
+            firebase.auth().signInWithPopup(provider).catch(err => {
+                alert("Login Error: " + err.message);
+            });
         }
 
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('my-avatar').src = user.photoURL;
+                
                 const socket = io("https://chat-tr1m.onrender.com");
                 socket.emit("user_join", { name: user.displayName, photo: user.photoURL });
-                
+
                 socket.on("update_users", users => {
                     const list = document.getElementById('user-list');
-                    list.innerHTML = Object.values(users).map(u => `<div style="padding:15px; border-bottom:1px solid #eee;">${u.name}</div>`).join('');
+                    list.innerHTML = Object.values(users).map(u => `
+                        <div class="user-list-item" onclick="selectUser('${u.name}')">
+                            <img src="${u.photo}">
+                            <div><strong>${u.name}</strong><br><small style="color: #00a884;">Online</small></div>
+                        </div>
+                    `).join('');
                 });
             }
         });
+
+        function selectUser(name) {
+            document.getElementById('active-user-info').innerText = name;
+            document.getElementById('calling-tools').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
