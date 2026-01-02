@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web - Signaling Fix</title>
+    <title>WhatsApp Clone - Voice & Video Fixed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -13,74 +13,63 @@
         .hidden { display: none !important; }
         body { background-color: #f0f2f5; height: 100vh; overflow: hidden; }
 
-        /* Login Screen */
-        #login-page { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        .btn-google { background: #008069; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
-
-        /* Main App */
+        /* App Structure */
         #chat-app { width: 100vw; height: 100vh; display: flex; }
         .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: #fff; }
         .main-chat { width: 70%; background: #efeae2; display: flex; flex-direction: column; position: relative; }
 
-        /* Header */
-        .header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; min-height: 60px; }
-        .user-card { padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #f2f2f2; }
-        .user-card:hover { background: #f5f6f6; }
-
         /* Call Overlay */
-        #call-overlay { position: fixed; inset: 0; background: #0b141a; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        video { width: 80%; max-width: 450px; border-radius: 12px; border: 2px solid #00a884; margin: 20px 0; }
-        .call-actions { display: flex; gap: 30px; margin-top: 20px; }
-        .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; color: white; display: flex; align-items: center; justify-content: center; }
-        .accept { background: #25d366; }
-        .reject { background: #f44336; }
+        #call-overlay { position: fixed; inset: 0; background: #0b141a; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .video-grid { display: flex; gap: 10px; width: 90%; max-width: 800px; margin-bottom: 20px; }
+        video { width: 50%; border-radius: 10px; background: #000; border: 1px solid #00a884; }
+        #remote-video { border-color: #25d366; }
+        
+        .call-controls { display: flex; gap: 20px; }
+        .btn-call { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; color: white; display: flex; align-items: center; justify-content: center; }
+        .btn-accept { background: #25d366; }
+        .btn-hangup { background: #f44336; }
 
-        /* Messages */
-        #msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .m { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; }
-        .sent { align-self: flex-end; background: #d9fdd3; }
-        .recv { align-self: flex-start; background: #fff; }
+        /* Login */
+        #login-page { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; }
     </style>
 </head>
 <body>
 
     <div id="login-page">
-        <h2 style="margin-bottom:20px;">WhatsApp Web Clone</h2>
-        <button class="btn-google" onclick="doLogin()">Login with Google</button>
+        <button onclick="doLogin()" style="padding:15px 30px; background:#008069; color:white; border:none; border-radius:5px; cursor:pointer;">Login with Google</button>
     </div>
 
     <div id="chat-app" class="hidden">
         <div class="sidebar">
-            <div class="header">
+            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between;">
                 <img id="my-img" style="width:40px; border-radius:50%;">
-                <i class="fas fa-sign-out-alt" onclick="doLogout()" style="cursor:pointer; color:#54656f;"></i>
+                <button onclick="doLogout()">Logout</button>
             </div>
             <div id="user-list"></div>
         </div>
 
         <div class="main-chat">
-            <div class="header">
-                <b id="chat-title">Select a user</b>
-                <div id="call-btns" class="hidden">
-                    <i class="fas fa-phone-alt" onclick="initiateCall('audio')" style="margin-right:25px; cursor:pointer;"></i>
-                    <i class="fas fa-video" onclick="initiateCall('video')" style="cursor:pointer;"></i>
+            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between;">
+                <b id="chat-title">Select User</b>
+                <div id="call-icons" class="hidden">
+                    <i class="fas fa-phone-alt" onclick="startWebRTCCall('audio')" style="margin-right:20px; cursor:pointer;"></i>
+                    <i class="fas fa-video" onclick="startWebRTCCall('video')" style="cursor:pointer;"></i>
                 </div>
             </div>
 
             <div id="call-overlay" class="hidden">
-                <h2 id="call-msg">Incoming Call...</h2>
-                <video id="v-preview" autoplay playsinline></video>
-                <div class="call-actions">
-                    <button id="ans-btn" class="c-btn accept hidden" onclick="answerCall()"><i class="fas fa-phone"></i></button>
-                    <button class="c-btn reject" onclick="hangUp()"><i class="fas fa-phone-slash"></i></button>
+                <h2 id="call-status">Connecting...</h2>
+                <div class="video-grid">
+                    <video id="local-video" autoplay muted playsinline title="My Video"></video>
+                    <video id="remote-video" autoplay playsinline title="Their Video"></video>
+                </div>
+                <div class="call-controls">
+                    <button id="accept-call-btn" class="btn-call btn-accept hidden" onclick="answerWebRTCCall()"><i class="fas fa-phone"></i></button>
+                    <button class="btn-call btn-hangup" onclick="endWebRTCCall()"><i class="fas fa-phone-slash"></i></button>
                 </div>
             </div>
 
-            <div id="msg-box"></div>
-            <div style="padding:10px; background:#f0f2f5; display:flex; gap:10px;">
-                <input type="text" id="m-input" style="flex:1; padding:10px; border-radius:20px; border:none;" placeholder="Type a message">
-                <i class="fas fa-paper-plane" onclick="sendMsg()" style="padding:10px; cursor:pointer;"></i>
-            </div>
+            <div id="messages" style="flex:1; overflow-y:auto; padding:20px;"></div>
         </div>
     </div>
 
@@ -95,32 +84,22 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let targetUser = null;
-        let stream = null;
+        let pc = null; // Peer Connection
+        let localStream = null;
+        let remoteUser = null;
 
-        function doLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider);
-        }
-
-        function doLogout() {
-            firebase.auth().signOut().then(() => {
-                location.reload(); 
-            });
-        }
+        // --- AUTH ---
+        function doLogin() { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function doLogout() { firebase.auth().signOut().then(() => location.reload()); }
 
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('chat-app').classList.remove('hidden');
                 document.getElementById('my-img').src = user.photoURL;
-                db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL, online: true });
+                db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL });
                 loadUsers();
-                listenForCalls(user.uid);
-                loadMessages();
-            } else {
-                document.getElementById('login-page').classList.remove('hidden');
-                document.getElementById('chat-app').classList.add('hidden');
+                listenForSignals(user.uid);
             }
         });
 
@@ -130,88 +109,86 @@
                 list.innerHTML = "";
                 snap.forEach(doc => {
                     if(doc.id !== firebase.auth().currentUser.uid) {
-                        list.innerHTML += `<div class="user-card" onclick="setTarget('${doc.id}', '${doc.data().name}')">
-                            <img src="${doc.data().photo}" style="width:40px; border-radius:50%;">
-                            <b>${doc.data().name}</b></div>`;
+                        list.innerHTML += `<div onclick="setRemoteUser('${doc.id}', '${doc.data().name}')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">${doc.data().name}</div>`;
                     }
                 });
             });
         }
 
-        function setTarget(id, name) {
-            targetUser = id;
+        function setRemoteUser(id, name) {
+            remoteUser = id;
             document.getElementById('chat-title').innerText = name;
-            document.getElementById('call-btns').classList.remove('hidden');
+            document.getElementById('call-icons').classList.remove('hidden');
         }
 
-        // CALLING ENGINE
-        async function initiateCall(type) {
-            const me = firebase.auth().currentUser;
-            await db.collection("calls").doc(targetUser).set({
-                from: me.displayName,
-                type: type,
-                status: 'ringing'
-            });
-            showUI(true, type);
+        // --- WebRTC LOGIC ---
+        const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
+        async function startWebRTCCall(type) {
+            document.getElementById('call-overlay').classList.remove('hidden');
+            pc = new RTCPeerConnection(servers);
+            localStream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            document.getElementById('local-video').srcObject = localStream;
+
+            pc.onicecandidate = e => {
+                if (e.candidate) db.collection("calls").doc(remoteUser).set({ candidate: e.candidate.toJSON(), from: firebase.auth().currentUser.uid }, { merge: true });
+            };
+
+            pc.ontrack = e => { document.getElementById('remote-video').srcObject = e.streams[0]; };
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            await db.collection("calls").doc(remoteUser).set({ offer, type, callerName: firebase.auth().currentUser.displayName });
         }
 
-        function listenForCalls(myId) {
-            db.collection("calls").doc(myId).onSnapshot(doc => {
-                if (doc.exists && doc.data().status === 'ringing') {
-                    document.getElementById('call-msg').innerText = doc.data().from + " is calling...";
-                    document.getElementById('ans-btn').classList.remove('hidden');
-                    showUI(false, doc.data().type);
-                } else if (!doc.exists) {
-                    closeUI();
+        function listenForSignals(myId) {
+            db.collection("calls").doc(myId).onSnapshot(async doc => {
+                const data = doc.data();
+                if (data && data.offer && !pc) {
+                    document.getElementById('call-overlay').classList.remove('hidden');
+                    document.getElementById('call-status').innerText = "Incoming Call from " + data.callerName;
+                    document.getElementById('accept-call-btn').classList.remove('hidden');
+                }
+                if (data && data.answer && pc) {
+                    await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+                }
+                if (data && data.candidate && pc) {
+                    await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
                 }
             });
         }
 
-        async function showUI(isOut, type) {
-            document.getElementById('call-overlay').classList.remove('hidden');
-            stream = await navigator.mediaDevices.getUserMedia({ video: type==='video', audio:true });
-            document.getElementById('v-preview').srcObject = stream;
-            if(type==='audio') document.getElementById('v-preview').style.display = 'none';
+        async function answerWebRTCCall() {
+            const myId = firebase.auth().currentUser.uid;
+            const callDoc = await db.collection("calls").doc(myId).get();
+            const data = callDoc.data();
+            
+            pc = new RTCPeerConnection(servers);
+            localStream = await navigator.mediaDevices.getUserMedia({ video: data.type === 'video', audio: true });
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            document.getElementById('local-video').srcObject = localStream;
+
+            pc.onicecandidate = e => {
+                if (e.candidate) db.collection("calls").doc(data.from || remoteUser).set({ candidate: e.candidate.toJSON() }, { merge: true });
+            };
+
+            pc.ontrack = e => { document.getElementById('remote-video').srcObject = e.streams[0]; };
+
+            await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            await db.collection("calls").doc(data.from || remoteUser).set({ answer }, { merge: true });
+            
+            document.getElementById('accept-call-btn').classList.add('hidden');
+            document.getElementById('call-status').innerText = "Connected";
         }
 
-        function answerCall() {
-            document.getElementById('call-msg').innerText = "Connected";
-            document.getElementById('ans-btn').classList.add('hidden');
-        }
-
-        async function hangUp() {
-            if(stream) stream.getTracks().forEach(t => t.stop());
-            await db.collection("calls").doc(firebase.auth().currentUser.uid).delete();
-            if(targetUser) await db.collection("calls").doc(targetUser).delete();
-            closeUI();
-        }
-
-        function closeUI() {
-            document.getElementById('call-overlay').classList.add('hidden');
-        }
-
-        function sendMsg() {
-            const inp = document.getElementById('m-input');
-            if(inp.value) {
-                db.collection("messages").add({
-                    t: inp.value, s: firebase.auth().currentUser.displayName, 
-                    u: firebase.auth().currentUser.uid, ts: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                inp.value = "";
-            }
-        }
-
-        function loadMessages() {
-            db.collection("messages").orderBy("ts").onSnapshot(snap => {
-                const box = document.getElementById('msg-box');
-                box.innerHTML = "";
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const isMe = d.u === firebase.auth().currentUser.uid;
-                    box.innerHTML += `<div class="m ${isMe?'sent':'recv'}"><b>${d.s}</b><br>${d.t}</div>`;
-                });
-                box.scrollTop = box.scrollHeight;
-            });
+        function endWebRTCCall() {
+            if(localStream) localStream.getTracks().forEach(t => t.stop());
+            if(pc) pc.close();
+            db.collection("calls").doc(firebase.auth().currentUser.uid).delete();
+            location.reload();
         }
     </script>
 </body>
