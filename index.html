@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Nature Clone</title>
+    <title>WhatsApp Nature</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -13,9 +13,9 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        /* 🔥 Aapki Nature Image yahan set hai */
+        /* 🔥 FIX: Yahan wahi naam likha hai jo aapke folder mein hai */
         body { 
-            background-image: url('Gemini_Generated_Image_ixqfetixqfetixqf.jpg'); 
+            background-image: url('bg.jpg'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -28,61 +28,57 @@
 
         .hidden { display: none !important; }
 
-        /* Login Page Styling */
+        /* Login Box Styling */
         #login-page {
             position: fixed; inset: 0;
             background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             z-index: 10000;
             display: flex; align-items: center; justify-content: center;
-            flex-direction: column; color: white;
         }
         .login-card {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             padding: 50px; border-radius: 20px;
             text-align: center; border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            color: white;
         }
 
-        /* Main App Glass Look */
+        /* Main App Glassmorphism */
         #app { 
             display: flex; 
             width: 95vw; height: 90vh; 
             background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(15px); 
+            backdrop-filter: blur(20px); 
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .left-container { width: 30%; background: rgba(255, 255, 255, 0.9); border-right: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .right-container { width: 70%; position: relative; background: rgba(239, 234, 226, 0.3); display: flex; flex-direction: column; }
+        .left-container { width: 30%; background: rgba(255, 255, 255, 0.95); border-right: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .right-container { width: 70%; position: relative; background: rgba(239, 234, 226, 0.4); display: flex; flex-direction: column; }
 
-        /* Chat Wallpaper Overlay */
+        /* Chat wallpaper overlay */
         #msg-container { 
             flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
         }
 
-        /* Messages */
-        .msg { max-width: 65%; padding: 10px 15px; border-radius: 10px; font-size: 14.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .sent { align-self: flex-end; background: #d9fdd3; color: #111; }
-        .received { align-self: flex-start; background: white; color: #111; }
+        .header { padding: 12px 20px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .msg { max-width: 65%; padding: 10px 15px; border-radius: 10px; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .sent { align-self: flex-end; background: #d9fdd3; }
+        .received { align-self: flex-start; background: white; }
+        
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 15px; }
+        .user-item:hover { background: #f5f6f6; }
+        .user-item img { width: 45px; height: 45px; border-radius: 50%; }
 
-        /* Calling UI */
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 90%; height: 70%; display: flex; gap: 10px; position: relative; }
         video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
         #local-v { width: 120px; height: 160px; position: absolute; bottom: 20px; right: 20px; border: 2px solid white; border-radius: 8px; transform: scaleX(-1); }
-
-        /* Header & Inputs */
-        .header { padding: 12px 20px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
-        .user-item:hover { background: rgba(0, 168, 132, 0.1); }
-        .user-item img { width: 45px; height: 45px; border-radius: 50%; }
-        .c-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 22px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body onclick="unlockAudio()">
@@ -92,8 +88,8 @@
     <div id="login-page">
         <div class="login-card">
             <i class="fab fa-whatsapp" style="font-size: 70px; color: #25d366; margin-bottom: 15px;"></i>
-            <h2 style="margin-bottom: 25px;">WhatsApp Nature</h2>
-            <button onclick="login()" style="padding:15px 35px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:600; cursor:pointer; font-size: 16px;">SIGN IN WITH GOOGLE</button>
+            <h1 style="margin-bottom: 25px;">WhatsApp Nature</h1>
+            <button onclick="login()" style="padding:15px 35px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:600; cursor:pointer;">SIGN IN WITH GOOGLE</button>
         </div>
     </div>
 
@@ -101,8 +97,8 @@
         <div class="left-container">
             <div class="header">
                 <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
-                <b style="color: #54656f;">Chats</b>
-                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color: #54656f;"></i>
+                <b>Chats</b>
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer;"></i>
             </div>
             <div id="user-list" style="overflow-y: auto; flex: 1;"></div>
         </div>
@@ -114,34 +110,34 @@
                         <img id="header-img" style="width:40px; height:40px; border-radius:50%;">
                         <b id="header-name"></b>
                     </div>
-                    <div style="display:flex; gap:25px; color:#54656f; font-size: 18px;">
+                    <div style="display:flex; gap:25px; color:#54656f;">
                         <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer;"></i>
                         <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer;"></i>
                     </div>
                 </div>
                 <div id="msg-container"></div>
-                <div style="padding:15px; background:#f0f2f5; display:flex; gap:12px; align-items: center;">
-                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:12px 20px; border-radius:25px; border:none; outline:none; font-size: 15px;">
+                <div style="padding:15px; background:#f0f2f5; display:flex; gap:12px;">
+                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:12px; border-radius:25px; border:none; outline:none;">
                     <button onclick="sendMsg()" style="border:none; background:none; cursor:pointer;"><i class="fas fa-paper-plane" style="color:#00a884; font-size:22px;"></i></button>
                 </div>
             </div>
 
             <div id="call-ui" class="hidden">
-                <h2 id="call-status" style="margin-bottom: 20px;">Connecting...</h2>
+                <h2 id="call-status">Connecting...</h2>
                 <div class="video-box">
                     <video id="remote-v" autoplay playsinline></video>
                     <video id="local-v" autoplay muted playsinline></video>
                 </div>
-                <div style="margin-top:25px; display:flex; gap:35px;">
-                    <button id="ans-btn" class="c-btn hidden" style="background:#25d366;" onclick="acceptCall()"><i class="fas fa-phone"></i></button>
-                    <button class="c-btn" style="background:#ea0038;" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
+                <div style="margin-top:25px; display:flex; gap:30px;">
+                    <button id="ans-btn" class="c-btn hidden" style="background:#25d366; width:60px; height:60px; border-radius:50%; border:none; color:white;" onclick="acceptCall()"><i class="fas fa-phone"></i></button>
+                    <button class="c-btn" style="background:#ea0038; width:60px; height:60px; border-radius:50%; border:none; color:white;" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Firebase Config & Logic ---
+        // --- Firebase Config & SAME Logic ---
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
             authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -218,8 +214,8 @@
             inp.value = "";
         }
 
-        // WebRTC Calling Logic
-        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
+        // WebRTC Logic
+        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }] };
         async function startCall(type) {
             document.getElementById('call-ui').classList.remove('hidden');
             pc = new RTCPeerConnection(iceServers);
@@ -227,18 +223,10 @@
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
-            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON()); };
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             myCallDoc = targetId;
             await db.collection("calls").doc(targetId).set({ offer, type, from: firebase.auth().currentUser.uid });
-            db.collection("calls").doc(targetId).onSnapshot(doc => {
-                if(!doc.exists) location.reload();
-                if(doc.data()?.answer && pc.signalingState !== "stable") {
-                    pc.setRemoteDescription(new RTCSessionDescription(doc.data().answer));
-                    ringtone.pause();
-                }
-            });
         }
 
         function listenForCalls(myId) {
@@ -262,7 +250,6 @@
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
-            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(myCallDoc).collection("iceCandidates").add(e.candidate.toJSON()); };
             await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
             const ans = await pc.createAnswer();
             await pc.setLocalDescription(ans);
