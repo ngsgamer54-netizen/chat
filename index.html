@@ -3,87 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web - Calling Edition</title>
+    <title>WhatsApp Web - Professional Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         .hidden { display: none !important; }
-
-        /* Login Page UI (Matches ipll.jpeg) */
-        #login-page {
-            height: 100vh; background-color: #00a884;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-card {
-            background: white; width: 900px; height: 500px; border-radius: 3px;
-            display: flex; box-shadow: 0 17px 50px 0 rgba(0,0,0,.19), 0 12px 15px 0 rgba(0,0,0,.24);
-        }
-        .login-left { flex: 1.5; padding: 60px; }
-        .login-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-        .qr-placeholder { width: 260px; height: 260px; background: white; padding: 10px; border: 1px solid #eee; }
-        
-        .btn-google {
-            background: #008069; color: white; border: none; padding: 12px 25px;
-            border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 10px; margin-top: 30px;
-        }
-
-        /* App Layout */
-        #main-app { display: flex; height: 100vh; background: #f0f2f5; }
-        .side-panel { width: 30%; background: white; border-right: 1px solid #d1d7db; }
-        .chat-panel { width: 70%; display: flex; flex-direction: column; background: #efeae2; }
-        .header { height: 60px; background: #f0f2f5; display: flex; align-items: center; padding: 0 16px; justify-content: space-between; border-bottom: 1px solid #d1d7db; }
-        .user-list-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f2f2f2; }
-        .user-list-item:hover { background: #f5f6f6; }
-        .user-list-item img { width: 49px; height: 49px; border-radius: 50%; margin-right: 15px; }
-
-        /* Calling Icons */
-        .call-icons i { color: #54656f; font-size: 20px; cursor: pointer; margin-left: 25px; }
+        /* Professional Login UI (ipll.jpeg style) */
+        #login-page { height: 100vh; background: #00a884; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; width: 850px; height: 480px; display: flex; border-radius: 3px; box-shadow: 0 17px 50px rgba(0,0,0,0.19); }
+        .login-info { flex: 1.5; padding: 60px; }
+        .login-qr { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; border-left: 1px solid #f2f2f2; }
+        .qr-img { width: 240px; height: 240px; padding: 10px; border: 1px solid #eee; }
+        .google-btn { background: #008069; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 30px; display: flex; align-items: center; gap: 10px; }
+        /* Chat UI */
+        #main-app { display: flex; height: 100vh; }
+        .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; }
+        .chat-area { width: 70%; background: #efeae2; }
     </style>
 </head>
 <body>
-
     <div id="login-page">
-        <div class="login-card">
-            <div class="login-left">
-                <h1 style="color: #41525d; font-weight: 300; font-size: 28px;">Login to Start Chatting</h1>
-                <p style="color: #667781; margin-top: 20px; font-size: 18px;">Connect with everyone in the global room.</p>
-                <button class="btn-google" onclick="login()">
+        <div class="login-box">
+            <div class="login-info">
+                <h1 style="color: #41525d; font-weight: 300;">Login to Start Chatting</h1>
+                <p style="color: #667781; margin-top: 25px; font-size: 18px;">Connect with everyone in the global room.</p>
+                <button class="google-btn" onclick="startGoogleLogin()">
                     <i class="fab fa-google"></i> Sign in with Google
                 </button>
             </div>
-            <div class="login-right">
-                <div class="qr-placeholder">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=WhatsAppClone" alt="QR Code" style="width: 100%;">
+            <div class="login-qr">
+                <div class="qr-img">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=WhatsApp" style="width:100%;">
                 </div>
             </div>
         </div>
     </div>
-
     <div id="main-app" class="hidden">
-        <div class="side-panel">
-            <div class="header">
-                <img id="my-avatar" style="width: 40px; border-radius: 50%;">
-                <span style="font-weight: 600;">WhatsApp Web</span>
-            </div>
+        <div class="sidebar">
+            <div style="padding:15px; background:#f0f2f5;"><b>Online Users</b></div>
             <div id="user-list"></div>
         </div>
-        <div class="chat-panel">
-            <div class="header">
-                <div id="active-user-info" style="font-weight: 500;">Select a contact</div>
-                <div class="call-icons hidden" id="calling-tools">
-                    <i class="fas fa-video" title="Video Call" onclick="alert('Starting Video Call...')"></i>
-                    <i class="fas fa-phone-alt" title="WiFi Call" onclick="alert('Starting Voice Call...')"></i>
-                </div>
+        <div class="chat-area">
+            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between;">
+                <span id="target-name">Select Contact</span>
             </div>
-            <div style="flex: 1;"></div>
         </div>
     </div>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
@@ -94,39 +62,18 @@
             appId: "1:131666791116:web:fe41ca039c1bd9a774d069"
         };
         firebase.initializeApp(firebaseConfig);
-
-        function login() {
+        function startGoogleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(err => {
-                alert("Login Error: " + err.message);
-            });
+            firebase.auth().signInWithPopup(provider).catch(e => alert("Error: " + e.message));
         }
-
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('my-avatar').src = user.photoURL;
-                
                 const socket = io("https://chat-tr1m.onrender.com");
                 socket.emit("user_join", { name: user.displayName, photo: user.photoURL });
-
-                socket.on("update_users", users => {
-                    const list = document.getElementById('user-list');
-                    list.innerHTML = Object.values(users).map(u => `
-                        <div class="user-list-item" onclick="selectUser('${u.name}')">
-                            <img src="${u.photo}">
-                            <div><strong>${u.name}</strong><br><small style="color: #00a884;">Online</small></div>
-                        </div>
-                    `).join('');
-                });
             }
         });
-
-        function selectUser(name) {
-            document.getElementById('active-user-info').innerText = name;
-            document.getElementById('calling-tools').classList.remove('hidden');
-        }
     </script>
 </body>
 </html>
