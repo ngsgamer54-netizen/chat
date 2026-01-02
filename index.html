@@ -11,74 +11,64 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
-        /* 🔥 FIX: Yahan wahi naam likha hai jo aapke folder mein hai */
+        /* Pure page par background image */
         body { 
+            margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif;
             background-image: url('bg.jpg'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             height: 100vh; 
             overflow: hidden; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .hidden { display: none !important; }
 
-        /* Login Box Styling */
+        /* Login Page - Glass Effect */
         #login-page {
-            position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
         }
         .login-card {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 50px; border-radius: 20px;
-            text-align: center; border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            color: white;
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px);
+            padding: 50px; border-radius: 20px; text-align: center; color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* Main App Glassmorphism */
+        /* Main App Container */
         #app { 
-            display: flex; 
-            width: 95vw; height: 90vh; 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(20px); 
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex; width: 95vw; height: 90vh; margin: 5vh auto;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px);
+            border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .left-container { width: 30%; background: rgba(255, 255, 255, 0.95); border-right: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .left-container { width: 30%; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .right-container { width: 70%; position: relative; background: rgba(239, 234, 226, 0.4); display: flex; flex-direction: column; }
 
-        /* Chat wallpaper overlay */
+        /* Chat Wallpaper */
         #msg-container { 
-            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px;
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
         }
 
-        .header { padding: 12px 20px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .msg { max-width: 65%; padding: 10px 15px; border-radius: 10px; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header { padding: 10px 20px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
         .sent { align-self: flex-end; background: #d9fdd3; }
         .received { align-self: flex-start; background: white; }
-        
-        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 15px; }
-        .user-item:hover { background: #f5f6f6; }
+
+        /* User List */
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        .user-item:hover { background: #f0f2f5; }
         .user-item img { width: 45px; height: 45px; border-radius: 50%; }
 
+        /* Calling UI Area */
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .video-box { width: 90%; height: 70%; display: flex; gap: 10px; position: relative; }
+        .video-box { width: 95%; height: 75%; display: flex; gap: 10px; position: relative; }
         video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
-        #local-v { width: 120px; height: 160px; position: absolute; bottom: 20px; right: 20px; border: 2px solid white; border-radius: 8px; transform: scaleX(-1); }
+        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; border-radius: 10px; transform: scaleX(-1); }
+        .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body onclick="unlockAudio()">
@@ -88,8 +78,8 @@
     <div id="login-page">
         <div class="login-card">
             <i class="fab fa-whatsapp" style="font-size: 70px; color: #25d366; margin-bottom: 15px;"></i>
-            <h1 style="margin-bottom: 25px;">WhatsApp Nature</h1>
-            <button onclick="login()" style="padding:15px 35px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:600; cursor:pointer;">SIGN IN WITH GOOGLE</button>
+            <h2>WhatsApp Nature</h2>
+            <button onclick="login()" style="margin-top:20px; padding:15px 35px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">SIGN IN WITH GOOGLE</button>
         </div>
     </div>
 
@@ -100,7 +90,7 @@
                 <b>Chats</b>
                 <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer;"></i>
             </div>
-            <div id="user-list" style="overflow-y: auto; flex: 1;"></div>
+            <div id="user-list"></div>
         </div>
 
         <div class="right-container">
@@ -128,16 +118,16 @@
                     <video id="remote-v" autoplay playsinline></video>
                     <video id="local-v" autoplay muted playsinline></video>
                 </div>
-                <div style="margin-top:25px; display:flex; gap:30px;">
-                    <button id="ans-btn" class="c-btn hidden" style="background:#25d366; width:60px; height:60px; border-radius:50%; border:none; color:white;" onclick="acceptCall()"><i class="fas fa-phone"></i></button>
-                    <button class="c-btn" style="background:#ea0038; width:60px; height:60px; border-radius:50%; border:none; color:white;" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
+                <div style="margin-top:20px; display:flex; gap:30px;">
+                    <button id="ans-btn" class="c-btn hidden" style="background:#25d366;" onclick="acceptCall()"><i class="fas fa-phone"></i></button>
+                    <button class="c-btn" style="background:#ea0038;" onclick="endCall()"><i class="fas fa-phone-slash"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Firebase Config & SAME Logic ---
+        // --- AAPKA ORIGINAL CODE (NO CHANGES) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
             authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -214,8 +204,7 @@
             inp.value = "";
         }
 
-        // WebRTC Logic
-        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }] };
+        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
         async function startCall(type) {
             document.getElementById('call-ui').classList.remove('hidden');
             pc = new RTCPeerConnection(iceServers);
@@ -223,10 +212,21 @@
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON()); };
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             myCallDoc = targetId;
             await db.collection("calls").doc(targetId).set({ offer, type, from: firebase.auth().currentUser.uid });
+            db.collection("calls").doc(targetId).onSnapshot(doc => {
+                if(!doc.exists) location.reload();
+                if(doc.data()?.answer && pc.signalingState !== "stable") {
+                    pc.setRemoteDescription(new RTCSessionDescription(doc.data().answer));
+                    ringtone.pause();
+                }
+            });
+            db.collection("calls").doc(targetId).collection("iceCandidates").onSnapshot(snap => {
+                snap.docChanges().forEach(change => { if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); });
+            });
         }
 
         function listenForCalls(myId) {
@@ -250,15 +250,23 @@
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(myCallDoc).collection("iceCandidates").add(e.candidate.toJSON()); };
             await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
             const ans = await pc.createAnswer();
             await pc.setLocalDescription(ans);
             await db.collection("calls").doc(myCallDoc).update({ answer: ans });
+            db.collection("calls").doc(myCallDoc).collection("iceCandidates").onSnapshot(snap => {
+                snap.docChanges().forEach(change => { if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); });
+            });
             document.getElementById('ans-btn').classList.add('hidden');
         }
 
         async function endCall() {
-            if(myCallDoc) await db.collection("calls").doc(myCallDoc).delete();
+            if(myCallDoc) {
+                const candidates = await db.collection("calls").doc(myCallDoc).collection("iceCandidates").get();
+                candidates.forEach(doc => doc.ref.delete());
+                await db.collection("calls").doc(myCallDoc).delete();
+            }
             location.reload();
         }
     </script>
