@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Clone Ultimate</title>
+    <title>WhatsApp Pro - Chat Fixed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -15,13 +15,22 @@
         #app { display: flex; width: 100vw; height: 100vh; }
         .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .main { width: 70%; display: flex; flex-direction: column; position: relative; background: #efeae2; }
+        
+        /* Chat UI Improvements */
+        #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
+        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+        .sent { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 0; }
+        .received { align-self: flex-start; background: white; border-top-left-radius: 0; }
+        
+        /* Calling UI (No Changes Here) */
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 95%; height: 75%; display: flex; gap: 10px; position: relative; }
         video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
         #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; transform: scaleX(-1); }
         .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .user-item img { width: 40px; border-radius: 50%; }
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
+        .user-item:hover { background: #f5f6f6; }
+        .user-item img { width: 45px; height: 45px; border-radius: 50%; }
     </style>
 </head>
 <body onclick="unlockAudio()">
@@ -30,31 +39,36 @@
 
     <div id="login-page" style="position:fixed; inset:0; background:#00a884; z-index:10000; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
         <i class="fab fa-whatsapp" style="font-size:80px; margin-bottom:20px;"></i>
-        <button onclick="login()" style="padding:15px 40px; background:white; color:#00a884; border:none; border-radius:50px; font-weight:bold; cursor:pointer;">SIGN IN WITH GOOGLE</button>
+        <button onclick="login()" style="padding:15px 40px; background:white; color:#00a884; border:none; border-radius:50px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">SIGN IN WITH GOOGLE</button>
     </div>
 
     <div id="app" class="hidden">
         <div class="sidebar">
-            <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
-                <img id="my-pic" style="width:40px; border-radius:50%;">
-                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer;"></i>
+            <div style="padding:10px 16px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
+                <img id="my-pic" style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color: #54656f; font-size: 20px;"></i>
             </div>
-            <div id="user-list"></div>
+            <div id="user-list" style="overflow-y: auto; flex: 1;"></div>
         </div>
 
         <div class="main">
             <div id="chat-window" class="hidden" style="flex:1; display:flex; flex-direction:column;">
-                <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
-                    <b id="header-name">Chat</b>
-                    <div style="display:flex; gap:25px;">
-                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer; color:#54656f;"></i>
-                        <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer; color:#54656f;"></i>
+                <div style="padding:10px 16px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center; border-left: 1px solid #ddd;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img id="header-img" style="width:40px; height:40px; border-radius:50%;">
+                        <b id="header-name" style="color: #111b21;"></b>
+                    </div>
+                    <div style="display:flex; gap:25px; color:#54656f; font-size: 18px;">
+                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer;"></i>
+                        <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer;"></i>
                     </div>
                 </div>
-                <div id="msg-container" style="flex:1; overflow-y:auto; padding:20px;"></div>
-                <div style="padding:10px; background:#f0f2f5; display:flex; gap:10px;">
-                    <input type="text" id="msg-input" style="flex:1; padding:10px; border-radius:10px; border:none;">
-                    <button onclick="sendMsg()" style="border:none; background:none; color:#00a884;"><i class="fas fa-paper-plane"></i></button>
+
+                <div id="msg-container"></div>
+
+                <div style="padding:10px 16px; background:#f0f2f5; display:flex; align-items:center; gap:12px;">
+                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:10px 15px; border-radius:8px; border:none; outline:none; font-size: 15px;">
+                    <button id="send-btn" style="border:none; background:none; cursor:pointer;"><i class="fas fa-paper-plane" style="color:#54656f; font-size:20px;"></i></button>
                 </div>
             </div>
 
@@ -83,10 +97,8 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let pc, localStream, targetId, myCallDoc;
+        let pc, localStream, targetId, myCallDoc, unsubChat;
         const ringtone = document.getElementById('ringtone');
-
-        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
 
         function unlockAudio() { ringtone.play().then(() => { ringtone.pause(); ringtone.currentTime = 0; }).catch(() => {}); }
         function login() { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
@@ -107,22 +119,64 @@
                 const list = document.getElementById('user-list'); list.innerHTML = "";
                 snap.forEach(doc => {
                     if (doc.id !== firebase.auth().currentUser.uid) {
-                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}')"><img src="${doc.data().photo}"><b>${doc.data().name}</b></div>`;
+                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}', '${doc.data().photo}')">
+                            <img src="${doc.data().photo}"><b>${doc.data().name}</b></div>`;
                     }
                 });
             });
         }
 
-        function openChat(id, name) { targetId = id; document.getElementById('chat-window').classList.remove('hidden'); document.getElementById('header-name').innerText = name; }
+        // --- CHAT LOGIC FIXED ---
+        function openChat(id, name, photo) {
+            targetId = id;
+            document.getElementById('chat-window').classList.remove('hidden');
+            document.getElementById('header-name').innerText = name;
+            document.getElementById('header-img').src = photo;
+            
+            // Stop previous chat listener if any
+            if(unsubChat) unsubChat();
+            loadMessages();
+        }
+
+        function loadMessages() {
+            const myId = firebase.auth().currentUser.uid;
+            // Combined ID for chat room (A_B or B_A always results in same ID)
+            const chatId = myId < targetId ? myId + "_" + targetId : targetId + "_" + myId;
+            
+            unsubChat = db.collection("chats").doc(chatId).collection("messages")
+                .orderBy("time", "asc")
+                .onSnapshot(snap => {
+                    const container = document.getElementById('msg-container');
+                    container.innerHTML = "";
+                    snap.forEach(doc => {
+                        const isMe = doc.data().sender === myId;
+                        container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">${doc.data().text}</div>`;
+                    });
+                    container.scrollTop = container.scrollHeight;
+                });
+        }
 
         function sendMsg() {
             const inp = document.getElementById('msg-input');
-            if (!inp.value) return;
+            const text = inp.value.trim();
+            if (!text || !targetId) return;
+
             const myId = firebase.auth().currentUser.uid;
-            const chatId = myId < targetId ? myId + targetId : targetId + myId;
-            db.collection("chats").doc(chatId).collection("messages").add({ text: inp.value, sender: myId, time: firebase.firestore.FieldValue.serverTimestamp() });
+            const chatId = myId < targetId ? myId + "_" + targetId : targetId + "_" + myId;
+
+            db.collection("chats").doc(chatId).collection("messages").add({
+                text: text,
+                sender: myId,
+                time: firebase.firestore.FieldValue.serverTimestamp()
+            });
             inp.value = "";
         }
+
+        document.getElementById('send-btn').onclick = sendMsg;
+        document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
+
+        // --- CALLING LOGIC (STABLE AS PER YOUR REQUEST) ---
+        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
 
         async function startCall(type) {
             document.getElementById('call-ui').classList.remove('hidden');
@@ -130,20 +184,12 @@
             localStream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-            
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
-            
-            // 🔥 Candidates exchange fix
-            pc.onicecandidate = e => {
-                if(e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON());
-            };
-
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON()); };
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             myCallDoc = targetId;
             await db.collection("calls").doc(targetId).set({ offer, type, from: firebase.auth().currentUser.uid });
-
-            // Listen for Answer
             db.collection("calls").doc(targetId).onSnapshot(doc => {
                 if(!doc.exists) location.reload();
                 if(doc.data()?.answer && pc.signalingState !== "stable") {
@@ -151,12 +197,8 @@
                     ringtone.pause();
                 }
             });
-
-            // Listen for Remote Candidates
             db.collection("calls").doc(targetId).collection("iceCandidates").onSnapshot(snap => {
-                snap.docChanges().forEach(change => {
-                    if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
-                });
+                snap.docChanges().forEach(change => { if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); });
             });
         }
 
@@ -181,25 +223,15 @@
             localStream = await navigator.mediaDevices.getUserMedia({ video: d.type === 'video', audio: true });
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
-            
-            pc.onicecandidate = e => {
-                if(e.candidate) db.collection("calls").doc(myCallDoc).collection("iceCandidates").add(e.candidate.toJSON());
-            };
-
+            pc.onicecandidate = e => { if(e.candidate) db.collection("calls").doc(myCallDoc).collection("iceCandidates").add(e.candidate.toJSON()); };
             await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
             const ans = await pc.createAnswer();
             await pc.setLocalDescription(ans);
             await db.collection("calls").doc(myCallDoc).update({ answer: ans });
-
-            // Listen for Caller's Ice Candidates
             db.collection("calls").doc(myCallDoc).collection("iceCandidates").onSnapshot(snap => {
-                snap.docChanges().forEach(change => {
-                    if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
-                });
+                snap.docChanges().forEach(change => { if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); });
             });
-
             document.getElementById('ans-btn').classList.add('hidden');
             document.getElementById('call-status').innerText = "Connected";
         }
