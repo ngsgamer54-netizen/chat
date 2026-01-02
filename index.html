@@ -21,16 +21,17 @@
             height: 100vh; overflow: hidden; 
         }
 
+        /* Force Hide/Show classes */
         .hidden { display: none !important; }
+        .show-flex { display: flex !important; }
 
-        /* Login Page Overlay */
         #login-page {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             backdrop-filter: blur(10px); z-index: 10000;
             display: flex; align-items: center; justify-content: center;
         }
 
-        #app { display: flex; width: 100vw; height: 100vh; background: rgba(255,255,255,0.1); }
+        #app { width: 100vw; height: 100vh; display: none; } /* Default hidden */
         .left-container { width: 30%; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .right-container { width: 70%; position: relative; background: rgba(239, 234, 226, 0.5); display: flex; flex-direction: column; }
 
@@ -40,15 +41,11 @@
         .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .sent { align-self: flex-end; background: #dcf8c6; }
         .received { align-self: flex-start; background: #fff; }
-        .msg img { max-width: 100%; border-radius: 5px; margin-top: 5px; }
-        .msg video { max-width: 100%; border-radius: 5px; }
+        .msg img, .msg video { max-width: 100%; border-radius: 5px; margin-top: 5px; }
 
         .input-area { height: 62px; background: #f0f2f5; display: flex; align-items: center; padding: 0 15px; gap: 15px; }
         .input-area input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; outline: none; }
         
-        #typing-text { font-size: 12px; color: #00a884; font-weight: 500; }
-        
-        /* Calling UI */
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 90%; height: 70%; display: flex; gap: 10px; }
         video { flex: 1; border-radius: 10px; background: #000; object-fit: cover; }
@@ -59,14 +56,14 @@
     <audio id="ringtone" src="https://www.soundjay.com/phone/phone-calling-1.mp3" loop></audio>
 
     <div id="login-page">
-        <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; width: 350px;">
             <i class="fab fa-whatsapp" style="font-size: 60px; color: #25d366; margin-bottom: 15px;"></i>
-            <h3 style="margin-bottom: 20px;">WhatsApp Nature</h3>
-            <button onclick="login()" style="width: 100%; padding:12px; background:#00a884; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; font-size: 16px;">SIGN IN WITH GOOGLE</button>
+            <h3>WhatsApp Nature</h3>
+            <button onclick="login()" style="margin-top:20px; padding:12px 25px; background:#00a884; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">SIGN IN WITH GOOGLE</button>
         </div>
     </div>
 
-    <div id="app" class="hidden">
+    <div id="app">
         <div class="left-container">
             <div class="header">
                 <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
@@ -75,37 +72,28 @@
             </div>
             <div id="user-list" style="overflow-y:auto; flex:1;"></div>
         </div>
-
         <div class="right-container">
             <div id="chat-window" class="hidden" style="flex:1; display:flex; flex-direction:column;">
                 <div class="header">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <img id="header-img" style="width:40px; height:40px; border-radius:50%;">
-                        <div>
-                            <b id="header-name"></b><br>
-                            <span id="typing-text" class="hidden">typing...</span>
-                        </div>
+                        <div><b id="header-name"></b><br><span id="typing-text" class="hidden" style="color:#00a884; font-size:12px;">typing...</span></div>
                     </div>
                     <div style="display:flex; gap:20px; color: #54656f; font-size: 18px;">
                         <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer;"></i>
                         <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer;"></i>
                     </div>
                 </div>
-
                 <div id="msg-container"></div>
-
                 <div class="input-area">
                     <i class="far fa-smile" id="emoji-btn" style="font-size: 22px; cursor:pointer; color:#54656f;"></i>
                     <label for="file-up"><i class="fas fa-paperclip" style="font-size: 20px; cursor:pointer; color:#54656f;"></i></label>
                     <input type="file" id="file-up" class="hidden" onchange="uploadFile(this)">
-                    
                     <input type="text" id="msg-input" placeholder="Type a message" oninput="sendTyping()">
                     <i class="fas fa-paper-plane" onclick="sendMsg()" style="color:#00a884; font-size:22px; cursor:pointer;"></i>
                 </div>
             </div>
-
             <div id="call-ui" class="hidden">
-                <h2 id="call-status">Calling...</h2>
                 <div class="video-box">
                     <video id="remote-v" autoplay playsinline></video>
                     <video id="local-v" autoplay muted playsinline></video>
@@ -138,56 +126,30 @@
         emojiBtn.addEventListener('click', () => picker.togglePicker(emojiBtn));
         picker.on('emoji', emoji => { document.getElementById('msg-input').value += emoji; });
 
-        // Login Logic
+        // LOGIN FIX: Force Show/Hide
         function login() { 
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(err => alert("Login Error: " + err.message));
+            firebase.auth().signInWithPopup(provider);
         }
         function logout() { firebase.auth().signOut().then(() => location.reload()); }
 
         firebase.auth().onAuthStateChanged(user => {
+            const loginPage = document.getElementById('login-page');
+            const appPage = document.getElementById('app');
+            
             if (user) {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
+                loginPage.style.setProperty('display', 'none', 'important');
+                appPage.style.setProperty('display', 'flex', 'important');
                 document.getElementById('my-pic').src = user.photoURL;
                 db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL });
                 loadUsers(); listenForCalls(user.uid);
             } else {
-                document.getElementById('login-page').style.display = 'flex';
-                document.getElementById('app').classList.add('hidden');
+                loginPage.style.setProperty('display', 'flex', 'important');
+                appPage.style.setProperty('display', 'none', 'important');
             }
         });
 
-        // Typing logic
-        function sendTyping() {
-            if(!targetId) return;
-            const myId = firebase.auth().currentUser.uid;
-            db.collection("typing").doc(myId).set({ to: targetId });
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => db.collection("typing").doc(myId).set({ to: null }), 2000);
-        }
-
-        function listenTyping(tId) {
-            db.collection("typing").doc(tId).onSnapshot(doc => {
-                const el = document.getElementById('typing-text');
-                if(doc.exists && doc.data().to === firebase.auth().currentUser.uid) el.classList.remove('hidden');
-                else el.classList.add('hidden');
-            });
-        }
-
-        // File/Photo logic
-        async function uploadFile(input) {
-            const file = input.files[0];
-            if(!file || !targetId) return;
-            try {
-                const ref = storage.ref(`media/${Date.now()}_${file.name}`);
-                await ref.put(file);
-                const url = await ref.getDownloadURL();
-                const type = file.type.startsWith('image') ? 'img' : (file.type.startsWith('video') ? 'vid' : 'file');
-                sendMsg(url, type);
-            } catch (e) { alert("Upload Failed! Check Firebase Storage Rules."); }
-        }
-
+        // Chat Functions
         function loadUsers() {
             db.collection("users").onSnapshot(snap => {
                 const list = document.getElementById('user-list'); list.innerHTML = "";
@@ -222,7 +184,6 @@
                     let content = d.text ? `<p>${d.text}</p>` : "";
                     if(d.fileType === 'img') content = `<img src="${d.fileUrl}">`;
                     if(d.fileType === 'vid') content = `<video src="${d.fileUrl}" controls></video>`;
-                    
                     container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">${content}</div>`;
                 });
                 container.scrollTop = container.scrollHeight;
@@ -242,7 +203,32 @@
             inp.value = "";
         }
 
-        // --- CALLING LOGIC (NO CHANGES) ---
+        async function uploadFile(input) {
+            const file = input.files[0];
+            if(!file || !targetId) return;
+            const ref = storage.ref(`media/${Date.now()}_${file.name}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            const type = file.type.startsWith('image') ? 'img' : (file.type.startsWith('video') ? 'vid' : 'file');
+            sendMsg(url, type);
+        }
+
+        function sendTyping() {
+            if(!targetId) return;
+            db.collection("typing").doc(firebase.auth().currentUser.uid).set({ to: targetId });
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => db.collection("typing").doc(firebase.auth().currentUser.uid).set({ to: null }), 2000);
+        }
+
+        function listenTyping(tId) {
+            db.collection("typing").doc(tId).onSnapshot(doc => {
+                const el = document.getElementById('typing-text');
+                if(doc.exists && doc.data().to === firebase.auth().currentUser.uid) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+        }
+
+        // --- CALLING LOGIC (STRICTLY ORIGINAL) ---
         const ringtone = document.getElementById('ringtone');
         function unlockAudio() { ringtone.play().then(() => { ringtone.pause(); ringtone.currentTime = 0; }).catch(() => {}); }
         const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302"] }] };
