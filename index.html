@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Final Fix</title>
+    <title>WhatsApp Clone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -11,9 +11,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
-        /* 🔥 Nayi Nature Image yahan set ki hai */
+        /* 🔥 Aapka purana image name yahan hai */
         body { 
-            background-image: url('Gemini_Generated_Image_ixqfetixqfetixqf.jpg'); 
+            background-image: url('Gemini_Generated_Image_18g6jy18g6jy18g6p.png'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -24,19 +24,24 @@
 
         .hidden { display: none !important; }
 
-        /* App container ko transparent rakha hai taaki background dikhe */
+        /* Glassmorphism Effect */
         #app { 
             display: flex; 
-            width: 100vw; 
-            height: 100vh; 
-            background: rgba(255, 255, 255, 0.2); 
-            backdrop-filter: blur(8px); 
+            width: 95vw; 
+            height: 90vh; 
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(12px); 
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
-        .main { width: 70%; display: flex; flex-direction: column; position: relative; background: rgba(239, 234, 226, 0.4); }
+        .main { width: 70%; display: flex; flex-direction: column; position: relative; background: rgba(239, 234, 226, 0.5); }
         
-        /* Chat Wall */
+        /* 🔥 Chat Area Background - Aapka purana GitHub wala link */
         #msg-container { 
             flex: 1; 
             overflow-y: auto; 
@@ -55,9 +60,11 @@
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 95%; height: 75%; display: flex; gap: 10px; position: relative; }
         video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
-        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; transform: scaleX(-1); }
+        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; transform: scaleX(-1); border-radius: 10px; }
         .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
+        .user-item:hover { background: #f0f2f5; }
         .user-item img { width: 45px; height: 45px; border-radius: 50%; }
     </style>
 </head>
@@ -65,15 +72,17 @@
 
     <audio id="ringtone" src="https://www.soundjay.com/phone/phone-calling-1.mp3" loop preload="auto"></audio>
 
-    <div id="login-page" style="position:fixed; inset:0; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('Gemini_Generated_Image_ixqfetixqfetixqf.jpg'); background-size: cover; background-position: center; z-index:10000; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
-        <i class="fab fa-whatsapp" style="font-size: 80px; margin-bottom: 20px;"></i>
-        <button onclick="login()" style="padding:15px 40px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer; font-size: 18px;">SIGN IN WITH GOOGLE</button>
+    <div id="login-page" style="position:fixed; inset:0; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('Gemini_Generated_Image_18g6jy18g6jy18g6p.png'); background-size: cover; background-position: center; z-index:10000; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
+        <i class="fab fa-whatsapp" style="font-size: 80px; margin-bottom: 20px; color: #25d366;"></i>
+        <h2 style="margin-bottom: 20px;">WhatsApp Nature</h2>
+        <button onclick="login()" style="padding:15px 40px; background:#00a884; color:white; border:none; border-radius:50px; font-weight:bold; cursor:pointer; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">SIGN IN WITH GOOGLE</button>
     </div>
 
     <div id="app" class="hidden">
         <div class="sidebar">
-            <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
+            <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #ddd;">
                 <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
+                <b style="color: #54656f;">Chats</b>
                 <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer; color: #54656f;"></i>
             </div>
             <div id="user-list"></div>
@@ -81,7 +90,7 @@
 
         <div class="main">
             <div id="chat-window" class="hidden" style="flex:1; display:flex; flex-direction:column;">
-                <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
+                <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #ddd;">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <img id="header-img" style="width:40px; height:40px; border-radius:50%;">
                         <b id="header-name"></b>
@@ -93,7 +102,7 @@
                 </div>
                 <div id="msg-container"></div>
                 <div style="padding:10px; background:#f0f2f5; display:flex; gap:12px;">
-                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:12px; border-radius:25px; border:none; outline:none;">
+                    <input type="text" id="msg-input" placeholder="Type a message" style="flex:1; padding:12px; border-radius:25px; border:none; outline:none; background: white;">
                     <button onclick="sendMsg()" style="border:none; background:none; cursor:pointer;"><i class="fas fa-paper-plane" style="color:#00a884; font-size:22px;"></i></button>
                 </div>
             </div>
@@ -113,7 +122,7 @@
     </div>
 
     <script>
-        // --- JAVASCRIPT (Calling aur Texting code unchanged) ---
+        // --- AAPKA PURANA JAVASCRIPT LOGIC (SAME HAI) ---
         const firebaseConfig = {
             apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
             authDomain: "mywhatsappclone-12e96.firebaseapp.com",
