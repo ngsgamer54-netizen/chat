@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Final Call Fix</title>
+    <title>WhatsApp Clone - Audio Video Fixed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -12,58 +12,57 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         .hidden { display: none !important; }
         body { background: #f0f2f5; height: 100vh; overflow: hidden; }
-        
-        #login-page { position: fixed; inset: 0; background: white; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #login-page { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #chat-app { display: flex; height: 100vh; }
         .sidebar { width: 30%; border-right: 1px solid #ddd; background: #fff; display: flex; flex-direction: column; }
         .main-chat { width: 70%; background: #efeae2; display: flex; flex-direction: column; position: relative; }
-
-        /* Calling UI */
-        #call-screen { position: absolute; inset: 0; background: #0b141a; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .video-box { display: flex; gap: 10px; width: 95%; height: 60%; margin-top: 20px; }
-        video { flex: 1; border-radius: 12px; background: #000; border: 2px solid #00a884; transform: scaleX(-1); object-fit: cover; }
-        .call-btn-area { margin-top: 30px; display: flex; gap: 20px; }
-        .c-btn { padding: 15px 40px; border-radius: 40px; border: none; cursor: pointer; color: white; font-weight: bold; font-size: 18px; }
-        .ans { background: #25d366; }
-        .end { background: #f44336; }
+        
+        /* Call Interface */
+        #call-screen { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .video-container { display: flex; gap: 15px; width: 95%; height: 65%; }
+        video { flex: 1; border-radius: 12px; background: #222; border: 2px solid #00a884; object-fit: cover; }
+        .controls { margin-top: 30px; display: flex; gap: 25px; }
+        .btn { padding: 15px 40px; border-radius: 50px; border: none; cursor: pointer; color: white; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn-ans { background: #25d366; }
+        .btn-end { background: #ea0038; }
     </style>
 </head>
 <body>
 
     <div id="login-page">
-        <button onclick="login()" style="padding: 15px 30px; background: #075e54; color: white; border: none; border-radius: 5px; cursor: pointer;">Login with Google</button>
+        <h2 style="margin-bottom:20px">WhatsApp Web Clone</h2>
+        <button onclick="login()" style="padding:15px 30px; background:#008069; color:white; border:none; border-radius:5px; cursor:pointer;">Sign in with Google</button>
     </div>
 
     <div id="chat-app" class="hidden">
         <div class="sidebar">
-            <div style="padding: 15px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center;">
-                <img id="my-pic" style="width: 40px; height: 40px; border-radius: 50%;">
-                <button onclick="logout()">Logout</button>
+            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
+                <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer"></i>
             </div>
-            <div id="user-list" style="overflow-y: auto; flex: 1;"></div>
+            <div id="user-list" style="overflow-y:auto; flex:1;"></div>
         </div>
 
         <div class="main-chat">
-            <div style="padding: 15px; background: #f0f2f5; display: flex; justify-content: space-between;">
+            <div style="padding:15px; background:#f0f2f5; display:flex; justify-content:space-between;">
                 <b id="target-name">Select a User</b>
-                <div id="call-icons" class="hidden">
-                    <i class="fas fa-video" onclick="initiateCall()" style="cursor: pointer; font-size: 22px; color: #54656f;"></i>
+                <div id="call-tools" class="hidden">
+                    <i class="fas fa-video" onclick="initiateCall()" style="cursor:pointer; font-size:22px; color:#54656f;"></i>
                 </div>
             </div>
 
             <div id="call-screen" class="hidden">
-                <h2 id="call-status">Calling...</h2>
-                <div class="video-box">
+                <h3 id="call-status" style="margin-bottom:15px">Calling...</h3>
+                <div class="video-container">
                     <video id="local-video" autoplay muted playsinline></video>
                     <video id="remote-video" autoplay playsinline></video>
                 </div>
-                <div class="call-btn-area">
-                    <button id="ans-btn" class="c-btn ans hidden" onclick="answerCall()">Answer</button>
-                    <button class="c-btn end" onclick="endCall()">End Call</button>
+                <div class="controls">
+                    <button id="ans-btn" class="btn btn-ans hidden" onclick="answerCall()">Answer</button>
+                    <button class="btn btn-end" onclick="endCall()">End Call</button>
                 </div>
             </div>
-
-            <div id="messages" style="flex: 1; padding: 20px;"></div>
+            <div id="messages" style="flex:1;"></div>
         </div>
     </div>
 
@@ -78,20 +77,19 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
         let pc, localStream, targetId;
 
-        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-        function logout() { auth.signOut().then(() => location.reload()); }
+        function login() { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function logout() { firebase.auth().signOut().then(() => location.reload()); }
 
-        auth.onAuthStateChanged(user => {
+        firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('chat-app').classList.remove('hidden');
                 document.getElementById('my-pic').src = user.photoURL;
                 db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL });
                 loadUsers();
-                listenForCalls(user.uid);
+                listen(user.uid);
             }
         });
 
@@ -100,51 +98,44 @@
                 const list = document.getElementById('user-list');
                 list.innerHTML = "";
                 snap.forEach(doc => {
-                    if (doc.id !== auth.currentUser.uid) {
-                        list.innerHTML += `<div onclick="selectUser('${doc.id}', '${doc.data().name}')" style="padding: 15px; border-bottom: 1px solid #eee; cursor: pointer;"><b>${doc.data().name}</b></div>`;
+                    if (doc.id !== firebase.auth().currentUser.uid) {
+                        list.innerHTML += `<div onclick="select('${doc.id}', '${doc.data().name}')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;"><b>${doc.data().name}</b></div>`;
                     }
                 });
             });
         }
 
-        function selectUser(id, name) {
+        function select(id, name) {
             targetId = id;
             document.getElementById('target-name').innerText = name;
-            document.getElementById('call-icons').classList.remove('hidden');
+            document.getElementById('call-tools').classList.remove('hidden');
         }
 
-        const pcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        const pcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
         async function initiateCall() {
             document.getElementById('call-screen').classList.remove('hidden');
             pc = new RTCPeerConnection(pcConfig);
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
             document.getElementById('local-video').srcObject = localStream;
 
             pc.ontrack = e => document.getElementById('remote-video').srcObject = e.streams[0];
-            
             pc.onicecandidate = e => {
-                if (e.candidate) db.collection("calls").doc(targetId).collection("ice").add(e.candidate.toJSON());
+                if (e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON());
             };
 
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            
-            // Send call notification
-            await db.collection("calls").doc(targetId).set({ 
-                offer, 
-                from: auth.currentUser.uid, 
-                name: auth.currentUser.displayName 
-            });
+            await db.collection("calls").doc(targetId).set({ offer, from: firebase.auth().currentUser.uid, name: firebase.auth().currentUser.displayName });
         }
 
-        function listenForCalls(myId) {
+        function listen(myId) {
             db.collection("calls").doc(myId).onSnapshot(async doc => {
                 const data = doc.data();
                 if (data && data.offer && !pc) {
                     document.getElementById('call-screen').classList.remove('hidden');
-                    document.getElementById('call-status').innerText = "Incoming Call: " + data.name;
+                    document.getElementById('call-status').innerText = "Incoming: " + data.name;
                     document.getElementById('ans-btn').classList.remove('hidden');
                 }
                 if (data && data.answer && pc) {
@@ -152,25 +143,25 @@
                 }
             });
 
-            db.collection("calls").doc(myId).collection("ice").onSnapshot(snap => {
+            db.collection("calls").doc(myId).collection("iceCandidates").onSnapshot(snap => {
                 snap.docChanges().forEach(change => {
-                    if (change.type === "added" && pc) pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                    if (change.type === 'added' && pc) pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
                 });
             });
         }
 
         async function answerCall() {
-            const callDoc = await db.collection("calls").doc(auth.currentUser.uid).get();
-            const data = callDoc.data();
+            const snap = await db.collection("calls").doc(firebase.auth().currentUser.uid).get();
+            const data = snap.data();
             pc = new RTCPeerConnection(pcConfig);
             
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
             document.getElementById('local-video').srcObject = localStream;
 
             pc.ontrack = e => document.getElementById('remote-video').srcObject = e.streams[0];
             pc.onicecandidate = e => {
-                if (e.candidate) db.collection("calls").doc(data.from).collection("ice").add(e.candidate.toJSON());
+                if (e.candidate) db.collection("calls").doc(data.from).collection("iceCandidates").add(e.candidate.toJSON());
             };
 
             await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
