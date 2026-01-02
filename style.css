@@ -2,7 +2,15 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-body { background-color: #f0f2f5; height: 100vh; overflow: hidden; }
+/* 🔥 Background Update: Yahan aapki image add kar di hai */
+body { 
+    background-image: url('Gemini_Generated_Image_18g6jy18g6jy18g6p.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 100vh; 
+    overflow: hidden; 
+}
 
 /* Login Styles */
 .whatsapp-login-container { height: 100vh; width: 100%; position: relative; }
@@ -29,14 +37,38 @@ body { background-color: #f0f2f5; height: 100vh; overflow: hidden; }
 
 /* Chat UI Styles */
 .hidden { display: none !important; }
-.main-container { display: flex; height: 100vh; width: 100%; }
+
+/* 🔥 Container transparency: Taaki background dikhta rahe */
+.main-container { 
+    display: flex; 
+    height: 90vh; 
+    width: 95%; 
+    margin: 2.5vh auto; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
 .left-container { width: 30%; background: #fff; border-right: 1px solid #ddd; }
-.right-container { width: 70%; position: relative; background: #efeae2; }
+
+/* 🔥 Right Container logic: Piche nature background + upar WhatsApp pattern */
+.right-container { 
+    width: 70%; 
+    position: relative; 
+    background-color: rgba(239, 234, 226, 0.7); /* Thoda transparent */
+}
 
 .right-container::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    /* WhatsApp Default Pattern */
     background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-    opacity: 0.06; z-index: 0;
+    opacity: 0.1; 
+    z-index: 0;
 }
 
 .header { position: relative; height: 60px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; }
