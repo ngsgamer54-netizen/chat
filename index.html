@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web - Video Call</title>
+    <title>WhatsApp Clone - Calling Enabled</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -18,24 +18,29 @@
         .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .main-chat { width: 70%; background: #efeae2; display: flex; flex-direction: column; position: relative; }
 
-        /* Headers */
-        .side-header, .chat-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+        /* Header Styling */
+        .side-header, .chat-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; min-height: 60px; }
         .user-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .call-btns i { font-size: 20px; color: #54656f; cursor: pointer; margin-left: 20px; }
+        
+        /* Calling Icons */
+        .call-actions i { font-size: 20px; color: #54656f; cursor: pointer; margin-left: 25px; transition: 0.3s; }
+        .call-actions i:hover { color: #00a884; }
 
-        /* Video Call Overlay */
-        #video-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        video { width: 80%; max-width: 600px; border-radius: 10px; background: #333; }
-        .call-controls { margin-top: 20px; display: flex; gap: 20px; }
-        .end-call { background: #ea0038; padding: 15px; border-radius: 50%; cursor: pointer; }
+        /* Video Overlay */
+        #call-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0b141a; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        video { width: 90%; max-width: 500px; border-radius: 15px; border: 2px solid #00a884; transform: scaleX(-1); }
+        .call-footer { margin-top: 30px; display: flex; gap: 30px; }
+        .end-btn { background: #f44336; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; }
 
-        /* Chat Styles */
-        #msg-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; }
+        /* Messages */
+        #msg-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 65%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; position: relative; }
         .msg.sent { align-self: flex-end; background: #d9fdd3; }
         .msg.received { align-self: flex-start; background: #fff; }
-        .input-area { background: #f0f2f5; padding: 10px 15px; display: flex; gap: 10px; }
-        #msg-input { flex: 1; padding: 10px; border-radius: 20px; border: none; }
+
+        /* Input Area */
+        .input-bar { background: #f0f2f5; padding: 10px 15px; display: flex; align-items: center; gap: 15px; }
+        #msg-input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; outline: none; }
     </style>
 </head>
 <body>
@@ -44,36 +49,37 @@
         <div class="sidebar">
             <div class="side-header">
                 <img id="my-pic" class="user-img" src="">
-                <i class="fas fa-sign-out-alt" onclick="firebase.auth().signOut()" style="cursor:pointer"></i>
+                <i class="fas fa-sign-out-alt" onclick="firebase.auth().signOut()" style="cursor:pointer; color:#54656f;"></i>
             </div>
             <div style="padding:15px; border-bottom:1px solid #f2f2f2;"><b>Online Now</b></div>
-            <div id="user-list"></div>
         </div>
 
         <div class="main-chat">
             <div class="chat-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="https://via.placeholder.com/40" class="user-img">
-                    <b>Global Chat Room</b>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/147/147144.png" class="user-img">
+                    <div><b>Global Room</b><br><small style="color:#00a884;">online</small></div>
                 </div>
-                <div class="call-btns">
-                    <i class="fas fa-phone-alt" onclick="startCall('audio')"></i>
-                    <i class="fas fa-video" onclick="startCall('video')"></i>
+                <div class="call-actions">
+                    <i class="fas fa-phone-alt" title="Voice Call" onclick="initCall('audio')"></i>
+                    <i class="fas fa-video" title="Video Call" onclick="initCall('video')"></i>
                 </div>
             </div>
 
-            <div id="video-container" class="hidden">
-                <h2 id="call-status">Calling...</h2>
-                <video id="localVideo" autoplay muted playsinline></video>
-                <div class="call-controls">
-                    <div class="end-call" onclick="endCall()"><i class="fas fa-phone-slash"></i></div>
+            <div id="call-screen" class="hidden">
+                <h2 id="status-text" style="margin-bottom: 20px;">Calling...</h2>
+                <video id="my-video" autoplay muted playsinline></video>
+                <div class="call-footer">
+                    <div class="end-btn" onclick="stopCall()"><i class="fas fa-phone-slash"></i></div>
                 </div>
             </div>
 
             <div id="msg-container"></div>
-            <div class="input-area">
+
+            <div class="input-bar">
+                <i class="far fa-smile" style="font-size:24px; color:#54656f;"></i>
                 <input type="text" id="msg-input" placeholder="Type a message">
-                <i class="fas fa-paper-plane" onclick="sendMsg()" style="cursor:pointer; padding:10px;"></i>
+                <i class="fas fa-paper-plane" onclick="sendMsg()" style="font-size:22px; color:#54656f; cursor:pointer;"></i>
             </div>
         </div>
     </div>
@@ -89,7 +95,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let localStream;
+        let streamPtr;
 
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
@@ -97,36 +103,43 @@
                 document.getElementById('my-pic').src = user.photoURL;
                 loadMessages();
             } else {
-                window.location.reload(); // Redirect to login
+                // If logout, go back to login logic
+                window.location.reload();
             }
         });
 
-        // Video/Audio Calling Function
-        async function startCall(type) {
-            document.getElementById('video-container').classList.remove('hidden');
-            const constraints = {
-                video: type === 'video',
-                audio: true
-            };
+        // WiFi/Video Calling System
+        async function initCall(mode) {
+            const callUI = document.getElementById('call-screen');
+            const videoElem = document.getElementById('my-video');
+            const status = document.getElementById('status-text');
+            
+            callUI.classList.remove('hidden');
+            status.innerText = mode === 'video' ? "Starting Video Call..." : "Starting Voice Call...";
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia(constraints);
-                document.getElementById('localVideo').srcObject = localStream;
-                document.getElementById('call-status').innerText = type === 'video' ? "Video Calling..." : "Voice Calling...";
-            } catch (e) {
-                alert("Camera/Mic access denied!");
-                endCall();
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: mode === 'video',
+                    audio: true
+                });
+                streamPtr = stream;
+                videoElem.srcObject = stream;
+                if(mode === 'audio') videoElem.style.display = 'none';
+                else videoElem.style.display = 'block';
+            } catch (err) {
+                alert("Please allow Camera/Microphone access to call.");
+                stopCall();
             }
         }
 
-        function endCall() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
+        function stopCall() {
+            if (streamPtr) {
+                streamPtr.getTracks().forEach(track => track.stop());
             }
-            document.getElementById('video-container').classList.add('hidden');
+            document.getElementById('call-screen').classList.add('hidden');
         }
 
-        // Existing Chat Functions
+        // Chat Logic
         function sendMsg() {
             const input = document.getElementById('msg-input');
             const user = firebase.auth().currentUser;
@@ -149,11 +162,12 @@
                     const data = doc.data();
                     const isMe = data.uid === firebase.auth().currentUser.uid;
                     container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">
-                        <small style="color:#00a884">${data.sender}</small><br>${data.text}</div>`;
+                        <small style="color:#00a884; font-weight:bold;">${data.sender}</small><br>${data.text}</div>`;
                 });
                 container.scrollTop = container.scrollHeight;
             });
         }
+        document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
     </script>
 </body>
 </html>
