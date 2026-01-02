@@ -3,56 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web - QR Login</title>
+    <title>WhatsApp Web - Global Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         .hidden { display: none !important; }
-        
-        /* Layout Styling */
-        body { background-color: #f0f2f5; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; }
-        body::before { content: ""; position: absolute; top: 0; width: 100%; height: 222px; background: #00a884; z-index: -1; }
+        body { background-color: #f0f2f5; height: 100vh; overflow: hidden; }
 
-        /* Login Box (Matches ipll.jpeg) */
-        .login-box { background: white; width: 1000px; height: 550px; display: flex; box-shadow: 0 17px 50px rgba(0,0,0,0.2); border-radius: 3px; }
-        .login-left { flex: 1.5; padding: 60px; display: flex; flex-direction: column; justify-content: center; }
-        .login-right { flex: 1; display: flex; align-items: center; justify-content: center; border-left: 1px solid #f2f2f2; padding: 40px; }
-        .qr-frame { width: 280px; height: 280px; padding: 15px; border: 1px solid #eee; background: white; }
-        
-        .btn-google { background: #008069; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 12px; margin-top: 40px; }
+        /* Login UI (Already Working) */
+        .login-box { background: white; width: 1000px; height: 550px; display: flex; box-shadow: 0 17px 50px rgba(0,0,0,0.2); border-radius: 3px; margin: auto; position: absolute; top:0; bottom:0; left:0; right:0; }
+        .login-left { flex: 1.5; padding: 60px; }
+        .login-right { flex: 1; display: flex; align-items: center; justify-content: center; border-left: 1px solid #f2f2f2; }
+        .qr-frame { width: 260px; height: 260px; padding: 10px; border: 1px solid #eee; }
+        .btn-google { background: #008069; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 30px; }
 
-        /* Chat UI placeholder */
-        #chat-app { width: 100vw; height: 100vh; background: white; display: flex; flex-direction: column; }
-        .chat-header { background: #f0f2f5; padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; }
+        /* Full App Layout */
+        #chat-app { display: flex; width: 100vw; height: 100vh; background: #fff; }
+        .sidebar { width: 30%; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .main-chat { width: 70%; background: #efeae2; display: flex; flex-direction: column; }
+
+        /* Sidebar Header */
+        .side-header { background: #f0f2f5; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .user-img { width: 40px; height: 40px; border-radius: 50%; }
+        .user-list { flex: 1; overflow-y: auto; background: white; }
+        .user-item { padding: 15px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .user-item:hover { background: #f5f6f6; }
+
+        /* Chat Area */
+        .chat-header { background: #f0f2f5; padding: 10px 16px; display: flex; align-items: center; gap: 15px; }
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 60%; padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+        .msg.sent { align-self: flex-end; background: #d9fdd3; }
+        .msg.received { align-self: flex-self; background: #fff; }
+
+        /* Input Area */
+        .input-area { background: #f0f2f5; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
+        .input-area input { flex: 1; padding: 10px; border-radius: 8px; border: none; outline: none; }
+        .send-btn { color: #54656f; cursor: pointer; font-size: 20px; }
     </style>
 </head>
 <body>
 
     <div id="login-page" class="login-box hidden">
         <div class="login-left">
-            <h1 style="color:#41525d; font-weight: 300; font-size: 28px;">Login to Start Chatting</h1>
-            <p style="color:#667781; font-size: 18px; margin-top: 20px;">Connect with everyone in the global room.</p>
-            <button class="btn-google" onclick="doLogin()">
-                <i class="fab fa-google"></i> Sign in with Google
-            </button>
+            <h1 style="color:#41525d; font-weight: 300;">Login to Start Chatting</h1>
+            <p style="color:#667781; margin-top: 20px;">Connect with everyone in the global room.</p>
+            <button class="btn-google" onclick="doLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
         </div>
-        <div class="login-right">
-            <div class="qr-frame">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=WhatsApp" style="width:100%;">
-            </div>
-        </div>
+        <div class="login-right"><div class="qr-frame"><img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=WhatsApp" style="width:100%;"></div></div>
     </div>
 
     <div id="chat-app" class="hidden">
-        <div class="chat-header">
-            <b id="user-name">WhatsApp Clone</b>
-            <button onclick="firebase.auth().signOut()" style="padding: 5px 10px; cursor: pointer;">Logout</button>
+        <div class="sidebar">
+            <div class="side-header">
+                <img id="my-pic" class="user-img" src="">
+                <i class="fas fa-sign-out-alt" onclick="firebase.auth().signOut()" style="cursor:pointer; color:#54656f;"></i>
+            </div>
+            <div class="user-list" id="online-users">
+                <div style="padding:20px; text-align:center; color:#667781;">Waiting for users...</div>
+            </div>
         </div>
-        <div style="flex:1; padding: 20px; background: #efeae2; text-align: center;">
-            <h3>Welcome! You are now logged in.</h3>
-            <p>Select a contact to start video/voice calling.</p>
+        <div class="main-chat">
+            <div class="chat-header">
+                <img src="https://via.placeholder.com/40" class="user-img">
+                <div><b id="chat-with-name">Global Room</b><br><small style="color:#667781;">Online</small></div>
+            </div>
+            <div class="messages" id="msg-container"></div>
+            <div class="input-area">
+                <i class="far fa-smile send-btn"></i>
+                <input type="text" id="msg-input" placeholder="Type a message">
+                <i class="fas fa-paper-plane send-btn" onclick="sendMsg()"></i>
+            </div>
         </div>
     </div>
 
@@ -66,6 +90,7 @@
             appId: "1:131666791116:web:fe41ca039c1bd9a774d069"
         };
         firebase.initializeApp(firebaseConfig);
+        const socket = io("https://chat-tr1m.onrender.com");
 
         function doLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -73,20 +98,48 @@
         }
 
         firebase.auth().onAuthStateChanged(user => {
-            const loginPage = document.getElementById('login-page');
-            const chatApp = document.getElementById('chat-app');
-
             if (user) {
-                // User logged in hai
-                loginPage.classList.add('hidden');
-                chatApp.classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName;
-                document.body.style.background = "#fff";
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('chat-app').classList.remove('hidden');
+                document.getElementById('my-pic').src = user.photoURL;
+                
+                // Server ko batao hum online hain
+                socket.emit("user_join", { name: user.displayName, photo: user.photoURL });
             } else {
-                // User logged out hai
-                loginPage.classList.remove('hidden');
-                chatApp.classList.add('hidden');
+                document.getElementById('login-page').classList.remove('hidden');
+                document.getElementById('chat-app').classList.add('hidden');
             }
+        });
+
+        // Online Users ki list update karein
+        socket.on("update_users", users => {
+            const list = document.getElementById('online-users');
+            list.innerHTML = "";
+            users.forEach(u => {
+                list.innerHTML += `<div class="user-item">
+                    <img src="${u.photo}" class="user-img">
+                    <b>${u.name}</b>
+                </div>`;
+            });
+        });
+
+        function sendMsg() {
+            const input = document.getElementById('msg-input');
+            if(input.value.trim() !== "") {
+                const user = firebase.auth().currentUser;
+                socket.emit("send_message", { text: input.value, name: user.displayName });
+                input.value = "";
+            }
+        }
+
+        socket.on("new_message", data => {
+            const container = document.getElementById('msg-container');
+            const user = firebase.auth().currentUser;
+            const isMe = data.name === user.displayName;
+            container.innerHTML += `<div class="msg ${isMe ? 'sent' : 'received'}">
+                <small style="font-size:10px; color:#667781;">${data.name}</small><br>${data.text}
+            </div>`;
+            container.scrollTop = container.scrollHeight;
         });
     </script>
 </body>
