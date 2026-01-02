@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Ultra Stable</title>
+    <title>WhatsApp Clone Ultimate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -12,18 +12,21 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #dadbd3; height: 100vh; overflow: hidden; display: flex; }
         .hidden { display: none !important; }
-        #app { display: flex; width: 100vw; height: 100vh; background: #f0f2f5; }
+        #app { display: flex; width: 100vw; height: 100vh; }
         .sidebar { width: 30%; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
         .main { width: 70%; display: flex; flex-direction: column; position: relative; background: #efeae2; }
         #call-ui { position: absolute; inset: 0; background: #0b141a; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .video-box { width: 95%; height: 75%; display: flex; gap: 10px; position: relative; }
         video { flex: 1; border-radius: 12px; background: #111; object-fit: cover; }
-        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; }
+        #local-v { width: 130px; height: 180px; position: absolute; bottom: 15px; right: 15px; border: 2px solid white; z-index: 100; transform: scaleX(-1); }
         .c-btn { width: 65px; height: 65px; border-radius: 50%; border: none; font-size: 24px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .user-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .user-item img { width: 40px; border-radius: 50%; }
     </style>
 </head>
-<body onclick="unlockAudio()"> <audio id="ringtone" src="https://www.soundjay.com/phone/phone-calling-1.mp3" loop preload="auto"></audio>
+<body onclick="unlockAudio()">
+
+    <audio id="ringtone" src="https://www.soundjay.com/phone/phone-calling-1.mp3" loop preload="auto"></audio>
 
     <div id="login-page" style="position:fixed; inset:0; background:#00a884; z-index:10000; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
         <i class="fab fa-whatsapp" style="font-size:80px; margin-bottom:20px;"></i>
@@ -33,8 +36,8 @@
     <div id="app" class="hidden">
         <div class="sidebar">
             <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
-                <img id="my-pic" style="width:40px; height:40px; border-radius:50%;">
-                <button onclick="logout()" style="border:none; background:none; cursor:pointer;"><i class="fas fa-sign-out-alt"></i></button>
+                <img id="my-pic" style="width:40px; border-radius:50%;">
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor:pointer;"></i>
             </div>
             <div id="user-list"></div>
         </div>
@@ -43,9 +46,9 @@
             <div id="chat-window" class="hidden" style="flex:1; display:flex; flex-direction:column;">
                 <div style="padding:10px; background:#f0f2f5; display:flex; justify-content:space-between; align-items:center;">
                     <b id="header-name">Chat</b>
-                    <div style="display:flex; gap:20px;">
-                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer;"></i>
-                        <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer;"></i>
+                    <div style="display:flex; gap:25px;">
+                        <i class="fas fa-phone-alt" onclick="startCall('audio')" style="cursor:pointer; color:#54656f;"></i>
+                        <i class="fas fa-video" onclick="startCall('video')" style="cursor:pointer; color:#54656f;"></i>
                     </div>
                 </div>
                 <div id="msg-container" style="flex:1; overflow-y:auto; padding:20px;"></div>
@@ -56,7 +59,7 @@
             </div>
 
             <div id="call-ui" class="hidden">
-                <h2 id="call-status">Call Syncing...</h2>
+                <h2 id="call-status">Connecting...</h2>
                 <div class="video-box">
                     <video id="remote-v" autoplay playsinline></video>
                     <video id="local-v" autoplay muted playsinline></video>
@@ -83,9 +86,9 @@
         let pc, localStream, targetId, myCallDoc;
         const ringtone = document.getElementById('ringtone');
 
-        // Audio unlock function
-        function unlockAudio() { ringtone.play().then(() => { ringtone.pause(); ringtone.currentTime = 0; }); }
+        const iceServers = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
 
+        function unlockAudio() { ringtone.play().then(() => { ringtone.pause(); ringtone.currentTime = 0; }).catch(() => {}); }
         function login() { firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { firebase.auth().signOut().then(() => location.reload()); }
 
@@ -95,8 +98,7 @@
                 document.getElementById('app').classList.remove('hidden');
                 document.getElementById('my-pic').src = user.photoURL;
                 db.collection("users").doc(user.uid).set({ name: user.displayName, photo: user.photoURL });
-                loadUsers();
-                listenForCalls(user.uid);
+                loadUsers(); listenForCalls(user.uid);
             }
         });
 
@@ -105,7 +107,7 @@
                 const list = document.getElementById('user-list'); list.innerHTML = "";
                 snap.forEach(doc => {
                     if (doc.id !== firebase.auth().currentUser.uid) {
-                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}')">${doc.data().name}</div>`;
+                        list.innerHTML += `<div class="user-item" onclick="openChat('${doc.id}', '${doc.data().name}')"><img src="${doc.data().photo}"><b>${doc.data().name}</b></div>`;
                     }
                 });
             });
@@ -118,29 +120,44 @@
             if (!inp.value) return;
             const myId = firebase.auth().currentUser.uid;
             const chatId = myId < targetId ? myId + targetId : targetId + myId;
-            db.collection("chats").doc(chatId).collection("messages").add({
-                text: inp.value, sender: myId, time: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            db.collection("chats").doc(chatId).collection("messages").add({ text: inp.value, sender: myId, time: firebase.firestore.FieldValue.serverTimestamp() });
             inp.value = "";
         }
 
         async function startCall(type) {
             document.getElementById('call-ui').classList.remove('hidden');
-            pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            pc = new RTCPeerConnection(iceServers);
             localStream = await navigator.mediaDevices.getUserMedia({ video: type === 'video', audio: true });
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+            
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
             
-            const myId = firebase.auth().currentUser.uid;
-            myCallDoc = targetId; // Main document is the receiver's ID
-            
+            // 🔥 Candidates exchange fix
+            pc.onicecandidate = e => {
+                if(e.candidate) db.collection("calls").doc(targetId).collection("iceCandidates").add(e.candidate.toJSON());
+            };
+
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            await db.collection("calls").doc(targetId).set({ offer, type, from: myId, status: 'ringing' });
-            
-            // Auto-End Listener: If Receiver deletes the doc, Caller's side reloads
-            db.collection("calls").doc(targetId).onSnapshot(doc => { if(!doc.exists) location.reload(); });
+            myCallDoc = targetId;
+            await db.collection("calls").doc(targetId).set({ offer, type, from: firebase.auth().currentUser.uid });
+
+            // Listen for Answer
+            db.collection("calls").doc(targetId).onSnapshot(doc => {
+                if(!doc.exists) location.reload();
+                if(doc.data()?.answer && pc.signalingState !== "stable") {
+                    pc.setRemoteDescription(new RTCSessionDescription(doc.data().answer));
+                    ringtone.pause();
+                }
+            });
+
+            // Listen for Remote Candidates
+            db.collection("calls").doc(targetId).collection("iceCandidates").onSnapshot(snap => {
+                snap.docChanges().forEach(change => {
+                    if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                });
+            });
         }
 
         function listenForCalls(myId) {
@@ -148,34 +165,53 @@
                 if(!doc.exists) { if(pc) location.reload(); return; }
                 const d = doc.data();
                 if(d.offer && !pc) {
-                    targetId = d.from;
                     myCallDoc = myId;
+                    targetId = d.from;
                     document.getElementById('call-ui').classList.remove('hidden');
                     document.getElementById('ans-btn').classList.remove('hidden');
                     ringtone.play().catch(() => {});
                 }
-                if(d.answer && pc) { await pc.setRemoteDescription(new RTCSessionDescription(d.answer)); ringtone.pause(); }
             });
         }
 
         async function acceptCall() {
             ringtone.pause();
             const d = (await db.collection("calls").doc(firebase.auth().currentUser.uid).get()).data();
-            pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            pc = new RTCPeerConnection(iceServers);
             localStream = await navigator.mediaDevices.getUserMedia({ video: d.type === 'video', audio: true });
             document.getElementById('local-v').srcObject = localStream;
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
             pc.ontrack = e => document.getElementById('remote-v').srcObject = e.streams[0];
+            
+            pc.onicecandidate = e => {
+                if(e.candidate) db.collection("calls").doc(myCallDoc).collection("iceCandidates").add(e.candidate.toJSON());
+            };
+
             await pc.setRemoteDescription(new RTCSessionDescription(d.offer));
             const ans = await pc.createAnswer();
             await pc.setLocalDescription(ans);
-            await db.collection("calls").doc(firebase.auth().currentUser.uid).set({ answer: ans }, { merge: true });
+            await db.collection("calls").doc(myCallDoc).update({ answer: ans });
+
+            // Listen for Caller's Ice Candidates
+            db.collection("calls").doc(myCallDoc).collection("iceCandidates").onSnapshot(snap => {
+                snap.docChanges().forEach(change => {
+                    if (change.type === "added") pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                });
+            });
+
             document.getElementById('ans-btn').classList.add('hidden');
             document.getElementById('call-status').innerText = "Connected";
         }
 
         async function endCall() {
-            if(myCallDoc) await db.collection("calls").doc(myCallDoc).delete();
+            if(myCallDoc) {
+                const batch = db.batch();
+                const candidates = await db.collection("calls").doc(myCallDoc).collection("iceCandidates").get();
+                candidates.forEach(doc => batch.delete(doc.ref));
+                batch.delete(db.collection("calls").doc(myCallDoc));
+                await batch.commit();
+            }
             location.reload();
         }
     </script>
