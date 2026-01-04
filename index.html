@@ -171,6 +171,7 @@
         let pinnedUsers = JSON.parse(localStorage.getItem('pinned')) || [];
         const ringtone = document.getElementById('ringtone');
 
+        // Theme Toggle
         function toggleDarkMode() {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -183,6 +184,7 @@
             setTimeout(() => { if(document.getElementById("theme-btn")) document.getElementById("theme-btn").className = "fas fa-sun icon-btn"; }, 100);
         }
 
+        // Login / Logout
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { 
             db.collection("users").doc(auth.currentUser.uid).update({ status: "offline", lastSeen: Date.now() })
@@ -201,6 +203,41 @@
             }
         });
 
+        // Notifications Logic
+        async function setupNotifications() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Make sure path is relative to root
+                    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                    const perm = await Notification.requestPermission();
+                    if (perm === 'granted') {
+                        const t = await messaging.getToken({ 
+                            vapidKey: "BN6NESHS1TP_Vg57SoGL7kU-YDosLLnPwkn3xzemnkEaViy1P9ZyZLJRPISLAZqEbOKlsK70XGvuThoClAi19rQ",
+                            serviceWorkerRegistration: registration 
+                        });
+                        if (t) {
+                            await db.collection("users").doc(auth.currentUser.uid).update({ fcmToken: t });
+                        }
+                    }
+                } catch (err) { console.log("SW Setup Error:", err); }
+            }
+        }
+
+        async function triggerFCM(targetToken, title, body) {
+            if (!targetToken) return;
+            fetch('https://fcm-relay-api.vercel.app/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: targetToken,
+                    title: title,
+                    body: body,
+                    link: window.location.origin + "/chat/"
+                })
+            }).catch(e => console.log("FCM error:", e));
+        }
+
+        // User Loading
         function loadUsers() {
             db.collection("users").onSnapshot(snap => {
                 const list = document.getElementById('user-list');
@@ -265,22 +302,6 @@
             });
         }
 
-        async function triggerFCM(targetToken, title, body) {
-            if (!targetToken) return;
-            try {
-                await fetch('https://fcm-relay-api.vercel.app/send-notification', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: targetToken,
-                        title: title,
-                        body: body,
-                        link: window.location.origin + "/chat/"
-                    })
-                });
-            } catch (e) { console.error("Notification trigger failed", e); }
-        }
-
         async function sendMsg(url = null, type = null) {
             const inp = document.getElementById('msg-input');
             if(!inp.value.trim() && !url) return;
@@ -288,19 +309,13 @@
             const chatId = [auth.currentUser.uid, targetId].sort().join("_");
             
             db.collection("chats").doc(chatId).collection("messages").add({
-                text: messageText, 
-                sender: auth.currentUser.uid, 
-                time: firebase.firestore.FieldValue.serverTimestamp(),
-                fileUrl: url, 
-                fileType: type,
-                read: false,
-                edited: false
+                text: messageText, sender: auth.currentUser.uid, time: firebase.firestore.FieldValue.serverTimestamp(),
+                fileUrl: url, fileType: type, read: false, edited: false
             });
 
-            // Notify Receiver
+            // Trigger Notification for Message
             const receiverDoc = await db.collection("users").doc(targetId).get();
-            const fcmToken = receiverDoc.data()?.fcmToken;
-            triggerFCM(fcmToken, auth.currentUser.displayName, type ? `Sent a ${type}` : messageText);
+            triggerFCM(receiverDoc.data()?.fcmToken, auth.currentUser.displayName, type ? `Sent a ${type}` : messageText);
 
             inp.value = "";
             db.collection("users").doc(auth.currentUser.uid).update({ typingTo: "" });
@@ -328,24 +343,7 @@
             }
         }
 
-        async function setupNotifications() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/chat/firebase-messaging-sw.js');
-                    const perm = await Notification.requestPermission();
-                    if (perm === 'granted') {
-                        const t = await messaging.getToken({ 
-                            vapidKey: "BN6NESHS1TP_Vg57SoGL7kU-YDosLLnPwkn3xzemnkEaViy1P9ZyZLJRPISLAZqEbOKlsK70XGvuThoClAi19rQ",
-                            serviceWorkerRegistration: registration 
-                        });
-                        if (t) {
-                            await db.collection("users").doc(auth.currentUser.uid).update({ fcmToken: t });
-                        }
-                    }
-                } catch (err) { console.log("Setup Error:", err); }
-            }
-        }
-
+        // Calling Logic
         const rtcConfig = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
         
         async function startCall(type) {
@@ -360,10 +358,9 @@
             
             const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
             myCallDoc = targetId; 
-            
             await db.collection("calls").doc(targetId).set({ offer, type, from: auth.currentUser.uid });
 
-            // Send Call Notification
+            // Trigger Call Notification
             const receiverDoc = await db.collection("users").doc(targetId).get();
             triggerFCM(receiverDoc.data()?.fcmToken, "Incoming Call", `${auth.currentUser.displayName} is calling you...`);
 
@@ -400,6 +397,7 @@
 
         function endCall() { if(myCallDoc) db.collection("calls").doc(myCallDoc).delete(); location.reload(); }
 
+        // Context Menus
         function showMsgMenu(e, id, me) { e.preventDefault(); if(!me) return; selectedMsgId = id; const m = document.getElementById('msg-menu'); m.style.display='block'; m.style.left=e.pageX+'px'; m.style.top=e.pageY+'px'; }
         function showUserMenu(e, id) { e.preventDefault(); selectedUserId = id; const m = document.getElementById('user-menu'); m.style.display='block'; m.style.left=e.pageX+'px'; m.style.top=e.pageY+'px'; }
         function hideMenus() { document.getElementById('msg-menu').style.display='none'; document.getElementById('user-menu').style.display='none'; }
