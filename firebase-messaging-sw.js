@@ -1,8 +1,6 @@
-// firebase-messaging-sw.js
 importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js');
 
-// Aapka Purana Firebase Config (No Changes)
 const firebaseConfig = {
     apiKey: "AIzaSyCRB3ghMxx-nq1tLIXVGPj53ZdlN_W1zbI",
     authDomain: "mywhatsappclone-12e96.firebaseapp.com",
@@ -15,46 +13,37 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Background handler: Jab app band ho tab notification dikhane ke liye
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Background message received ', payload);
+    console.log('Background Payload:', payload);
 
-    // Title aur Body extract karna (payload.notification ya payload.data dono handle honge)
-    const notificationTitle = payload.notification?.title || payload.data?.title || "New Message";
+    let title = payload.data?.title || payload.notification?.title || "New Notification";
+    let body = payload.data?.body || payload.notification?.body || "Aapko ek naya update mila hai.";
+    
+    // Agar payload mein 'call' word hai toh Calling wala behavior dikhao
+    const isCall = body.toLowerCase().includes("calling") || title.toLowerCase().includes("call");
+
     const notificationOptions = {
-        body: payload.notification?.body || payload.data?.body || "Aapko ek naya message mila hai.",
+        body: body,
         icon: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
         badge: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-        tag: 'chat-notification',
+        tag: isCall ? 'incoming-call' : 'new-msg',
         renotify: true,
-        vibrate: [200, 100, 200], // Vibration support
-        requireInteraction: true,
-        data: {
-            // Click karne par GitHub Pages ke /chat/ folder par le jayega
-            url: self.location.origin + '/chat/' 
-        }
+        vibrate: isCall ? [500, 200, 500, 200, 500] : [200, 100, 200],
+        requireInteraction: isCall ? true : false,
+        data: { url: self.location.origin + '/chat/' }
     };
 
-    return self.registration.showNotification(notificationTitle, notificationOptions);
+    return self.registration.showNotification(title, notificationOptions);
 });
 
-// Notification click logic (Purana logic optimized)
 self.addEventListener('notificationclick', (event) => {
-    const targetUrl = event.notification.data.url;
     event.notification.close();
-
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-            // Agar pehle se tab khula hai toh uspar focus karo
             for (const client of clientList) {
-                if (client.url.includes(targetUrl) && 'focus' in client) {
-                    return client.focus();
-                }
+                if (client.url.includes('/chat/') && 'focus' in client) return client.focus();
             }
-            // Agar nahi khula toh naya tab kholo
-            if (clients.openWindow) {
-                return clients.openWindow(targetUrl);
-            }
+            if (clients.openWindow) return clients.openWindow(event.notification.data.url);
         })
     );
 });
