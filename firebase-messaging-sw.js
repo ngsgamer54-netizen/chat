@@ -14,25 +14,28 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Background handler
+// Background handler - Jab app band ho tab notification dikhane ke liye
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Background message received ', payload);
 
-    // Agar payload mein notification object nahi hai, toh data se nikalenge
-    const notificationTitle = payload.notification ? payload.notification.title : (payload.data ? payload.data.title : "New Message");
+    // Data payload se title aur body nikalna (safety ke liye)
+    const notificationTitle = payload.notification?.title || payload.data?.title || "New Message";
+    const notificationBody = payload.notification?.body || payload.data?.body || "Aapko ek naya message aaya hai";
     
     const notificationOptions = {
-        body: payload.notification ? payload.notification.body : (payload.data ? payload.data.body : "You have a new alert"),
-        icon: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg', // Professional Icon
+        body: notificationBody,
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
         badge: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-        tag: 'whatsapp-nature-notification', // Taki multiple notifications ek hi jagah club ho jayein
+        tag: 'whatsapp-nature-notification', 
         renotify: true,
+        requireInteraction: true, // Notification tab tak nahi jayega jab tak user click na kare
         data: {
-            url: self.location.origin // Notification click karne par site khulegi
+            // Click karne par sahi folder khule iske liye path fix
+            url: self.location.origin + (self.location.pathname.includes('/chat/') ? '/chat/' : '/')
         }
     };
 
-    // Vibrate pattern for Call
+    // Call ke liye vibration pattern
     if (notificationTitle.toLowerCase().includes('call')) {
         notificationOptions.vibrate = [200, 100, 200, 100, 200, 100, 400];
     }
@@ -42,13 +45,21 @@ messaging.onBackgroundMessage((payload) => {
 
 // Notification click karne par website kholne ke liye
 self.addEventListener('notificationclick', (event) => {
+    const targetUrl = event.notification.data.url;
     event.notification.close();
+
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-            if (clientList.length > 0) {
-                return clientList[0].focus();
+            // Agar pehle se tab khula hai toh uspar focus karo
+            for (const client of clientList) {
+                if (client.url.includes(targetUrl) && 'focus' in client) {
+                    return client.focus();
+                }
             }
-            return clients.openWindow('/');
+            // Agar nahi khula toh naya tab kholo
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
         })
     );
 });
