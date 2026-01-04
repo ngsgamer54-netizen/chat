@@ -16,7 +16,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
         
-        /* Default Light Mode Variables */
         :root { 
             --bg-color: #e5ddd5; 
             --header-bg: #f0f2f5; 
@@ -29,7 +28,6 @@
             --border-color: #ddd;
         }
 
-        /* Dark Mode Variables */
         [data-theme="dark"] {
             --header-bg: #202c33;
             --sidebar-bg: #111b21;
@@ -173,7 +171,6 @@
         let pinnedUsers = JSON.parse(localStorage.getItem('pinned')) || [];
         const ringtone = document.getElementById('ringtone');
 
-        // --- Dark Mode Logic ---
         function toggleDarkMode() {
             const currentTheme = document.documentElement.getAttribute("data-theme");
             const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -307,13 +304,13 @@
             }
         }
 
-        // --- Notification Registration Fixed for Mobile ---
+        // --- FIXED: Stable Notification Setup ---
         async function setupNotifications() {
             if ('serviceWorker' in navigator) {
                 try {
-                    // Registration ko thoda stable banaya gaya hai
-                    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    console.log('SW Registered');
+                    // Mobile aur Sub-folders ke liye path fix
+                    const swPath = window.location.pathname.includes('/chat/') ? '/chat/firebase-messaging-sw.js' : '/firebase-messaging-sw.js';
+                    const registration = await navigator.serviceWorker.register(swPath);
                     
                     const perm = await Notification.requestPermission();
                     if (perm === 'granted') {
@@ -321,9 +318,12 @@
                             vapidKey: "BN6NESHS1TP_Vg57SoGL7kU-YDoslLnPwkn3xzemnkEaViy1P9ZyZLJRPISLAZqEbOKlsK70XGvuThoClAi19rQ",
                             serviceWorkerRegistration: registration 
                         });
-                        db.collection("users").doc(auth.currentUser.uid).update({ fcmToken: t });
+                        if (t) {
+                            await db.collection("users").doc(auth.currentUser.uid).update({ fcmToken: t });
+                            console.log("Token updated successfully");
+                        }
                     }
-                } catch (err) { console.log("Worker/Token Error:", err); }
+                } catch (err) { console.log("Setup Error:", err); }
             }
         }
 
