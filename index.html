@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Nature Pro Max</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -180,10 +181,9 @@
             localStorage.setItem("theme", newTheme);
             document.getElementById("theme-btn").className = newTheme === "dark" ? "fas fa-sun icon-btn" : "fas fa-moon icon-btn";
         }
-        // Load Saved Theme
         if (localStorage.getItem("theme") === "dark") {
             document.documentElement.setAttribute("data-theme", "dark");
-            setTimeout(() => { document.getElementById("theme-btn").className = "fas fa-sun icon-btn"; }, 100);
+            setTimeout(() => { if(document.getElementById("theme-btn")) document.getElementById("theme-btn").className = "fas fa-sun icon-btn"; }, 100);
         }
 
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
@@ -311,7 +311,10 @@
         async function setupNotifications() {
             if ('serviceWorker' in navigator) {
                 try {
+                    // Registration ko thoda stable banaya gaya hai
                     const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    console.log('SW Registered');
+                    
                     const perm = await Notification.requestPermission();
                     if (perm === 'granted') {
                         const t = await messaging.getToken({ 
@@ -378,8 +381,10 @@
         window.onload = () => {
             const picker = new EmojiButton({ position: 'top-start', rootElement: document.body, zIndex: 9999 });
             const btn = document.querySelector('#emoji-trigger');
-            btn.onclick = () => picker.togglePicker(btn);
-            picker.on('emoji', s => { document.querySelector('#msg-input').value += s; });
+            if(btn) {
+                btn.onclick = () => picker.togglePicker(btn);
+                picker.on('emoji', s => { document.querySelector('#msg-input').value += s; });
+            }
         };
     </script>
 </body>
