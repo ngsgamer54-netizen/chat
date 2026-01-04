@@ -265,12 +265,16 @@
             });
         }
 
-        function sendMsg(url = null, type = null) {
+        // --- UPDATED: sendMsg with Notification Fetch ---
+        async function sendMsg(url = null, type = null) {
             const inp = document.getElementById('msg-input');
             if(!inp.value.trim() && !url) return;
+            const messageText = inp.value;
             const chatId = [auth.currentUser.uid, targetId].sort().join("_");
+            
+            // 1. Save to Firestore
             db.collection("chats").doc(chatId).collection("messages").add({
-                text: inp.value, 
+                text: messageText, 
                 sender: auth.currentUser.uid, 
                 time: firebase.firestore.FieldValue.serverTimestamp(),
                 fileUrl: url, 
@@ -278,6 +282,23 @@
                 read: false,
                 edited: false
             });
+
+            // 2. Trigger Notification
+            const receiverDoc = await db.collection("users").doc(targetId).get();
+            const fcmToken = receiverDoc.data()?.fcmToken;
+            if (fcmToken) {
+                fetch('https://fcm-relay-api.vercel.app/send-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: fcmToken,
+                        title: `New Message from ${auth.currentUser.displayName}`,
+                        body: type === 'img' ? "Sent a photo" : messageText,
+                        link: "https://ngsgamer54-netizen.github.io/chat/"
+                    })
+                }).catch(e => console.log("Notify Error:", e));
+            }
+
             inp.value = "";
             db.collection("users").doc(auth.currentUser.uid).update({ typingTo: "" });
         }
@@ -304,14 +325,11 @@
             }
         }
 
-        // --- FIXED: Stable Notification Setup ---
         async function setupNotifications() {
             if ('serviceWorker' in navigator) {
                 try {
-                    // Mobile aur Sub-folders ke liye path fix
                     const swPath = window.location.pathname.includes('/chat/') ? '/chat/firebase-messaging-sw.js' : '/firebase-messaging-sw.js';
                     const registration = await navigator.serviceWorker.register(swPath);
-                    
                     const perm = await Notification.requestPermission();
                     if (perm === 'granted') {
                         const t = await messaging.getToken({ 
@@ -320,7 +338,6 @@
                         });
                         if (t) {
                             await db.collection("users").doc(auth.currentUser.uid).update({ fcmToken: t });
-                            console.log("Token updated successfully");
                         }
                     }
                 } catch (err) { console.log("Setup Error:", err); }
